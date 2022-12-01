@@ -1,0 +1,15 @@
+{
+    "name": "coffeecup/othello",
+    "autoload": {
+        "psr-4": {
+            "Coffeecup\\Othello\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "coffeecup",
+            "email": "IgYmB0218LP@gmail.com"
+        }
+    ],
+    "require": {}
+}
