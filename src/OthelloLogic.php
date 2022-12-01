@@ -50,11 +50,13 @@ class OthelloLogic {
 		//
 		if ($vertical_pos >= 6) { return false; }
 		$check_vertical_pos = $vertical_pos;
+		$defeated_enemy = array();
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
 			if ($check_vertical_pos == 0 || $check_vertical_pos == 7) { break; }
 			if ( $this->board[$check_vertical_pos + 1][$horizontal_pos] == $enemy_player ) {
 				$check_vertical_pos = $check_vertical_pos + 1;
+				array_push($defeated_enemy, [$check_vertical_pos, $horizontal_pos]);
 				continue;
 			}
 			break;
@@ -64,17 +66,20 @@ class OthelloLogic {
 		if ($this->board[$check_vertical_pos + 1][$horizontal_pos] != $player) {
 			return false;
 		}
+		$this->commitDefeatedMove($defeated_enemy, $player);
 		return true;
 	}
 	public function checkAbove($vertical_pos, $horizontal_pos, $player) {
 		//
 		if ($vertical_pos <= 1) { return false; }
 		$check_vertical_pos = $vertical_pos;
+		$defeated_enemy = array();
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
 			if ($check_vertical_pos == 0 || $check_vertical_pos == 0) { break; }
 			if ( $this->board[$check_vertical_pos - 1][$horizontal_pos] == $enemy_player ) {
 				$check_vertical_pos = $check_vertical_pos - 1;
+				array_push($defeated_enemy, [$check_vertical_pos, $horizontal_pos]);
 				continue;
 			}
 			break;
@@ -82,17 +87,20 @@ class OthelloLogic {
 		if ($check_vertical_pos == $vertical_pos) { return false; }
 		if ($check_vertical_pos == 0) { return false; }
 		if ($this->board[$check_vertical_pos - 1][$horizontal_pos] != $player) { return false; }
+		$this->commitDefeatedMove($defeated_enemy, $player);
 		return true;
 	}
 	public function checkLeft($vertical_pos, $horizontal_pos, $player) {
 		//
 		if ($horizontal_pos <= 1) { return false; }
 		$check_horizontal_pos = $horizontal_pos;
+		$defeated_enemy = array();
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
 			if ($check_horizontal_pos == 0 || $check_horizontal_pos == 7) { break; }
 			if ($this->board[$vertical_pos][$check_horizontal_pos - 1] == $enemy_player) {
 				$check_horizontal_pos = $check_horizontal_pos - 1;
+				array_push($defeated_enemy, [$vertical_pos, $check_horizontal_pos]);
 				continue;
 			}
 			break;
@@ -100,17 +108,20 @@ class OthelloLogic {
 		if ($check_horizontal_pos == $horizontal_pos) {return false; }
 		if ($check_horizontal_pos == 0) { return false; }
 		if ($this->board[$vertical_pos][$check_horizontal_pos - 1] != $player) { return false; }
+		$this->commitDefeatedMove($defeated_enemy, $player);
 		return true;
 	}
 	public function checkRight($vertical_pos, $horizontal_pos, $player) {
 		//
 		if ($horizontal_pos >= 6) { return false; }
 		$check_horizontal_pos = $horizontal_pos;
+		$defeated_enemy = array();
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
 			if ($check_horizontal_pos == 0 || $check_horizontal_pos == 7) { break; }
 			if ($this->board[$vertical_pos][$check_horizontal_pos + 1] == $enemy_player) {
 				$check_horizontal_pos = $check_horizontal_pos + 1;
+				array_push($defeated_enemy, [$vertical_pos, $check_horizontal_pos]);
 				continue;
 			}
 			break;
@@ -118,6 +129,7 @@ class OthelloLogic {
 		if ($check_horizontal_pos == $horizontal_pos) { return false; }
 		if ($check_horizontal_pos == 7) { return false; }
 		if ($this->board[$vertical_pos][$check_horizontal_pos + 1] != $player) { return false; }
+		$this->commitDefeatedMove($defeated_enemy, $player);
 		return true;
 	}
 	public function checkBelowLeft($vertical_pos, $horizontal_pos, $player) {
@@ -139,5 +151,10 @@ class OthelloLogic {
 		//
 		if ($vertical_pos <= 1 || $horizontal_pos >= 6) { return false; }
 		return true;
+	}
+	public function commitDefeatedMove($defeated_moves, $player) {
+		foreach ($defeated_moves as $d_move) {
+			$this->board[$d_move[0]][$d_move[1]] = $player;
+		}
 	}
 }
