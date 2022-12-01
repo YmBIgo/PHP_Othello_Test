@@ -17,8 +17,8 @@ class OthelloRepl {
 	}
 
 	public function main() {
-		echo Viewer::view_board($this->othello->getBoard());
 		while(true) {
+			echo Viewer::view_board($this->othello->getBoard())."\n";
 			echo "It's your turn ".$this->othello->getPlayer()." \n";
 			echo "Please Input vertical count;\n";
 			$stdin_vertical = (int)trim(fgets(STDIN));
@@ -26,8 +26,7 @@ class OthelloRepl {
 			$stdin_horizontal = (int)trim(fgets(STDIN));
 			$is_success = $this->othello->move($stdin_vertical - 1, $stdin_horizontal - 1);
 			if ($is_success == true) {
-				echo Viewer::view_board($this->othello->getBoard());
-				echo "\n\n";
+				echo "\n";
 			} else {
 				echo "Your move is incorrect...\nmove again\n\n";
 			}

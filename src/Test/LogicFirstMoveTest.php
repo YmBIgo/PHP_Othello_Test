@@ -85,8 +85,20 @@ class LogicFirstMoveTest extends MyPhpUnit {
 		$this->othello->initBoard();
 		$moveRight = $this->othello->move(3, 2);
 		MyAssertion::assertSame(true, $moveRight, "First Move @32 should return @33");
+		/*
 		$firstMoveRightResult = Viewer::view_board($this->othello->getBoard());
 		echo $firstMoveRightResult;
+		*/
+	}
+	public function testFirstMoveAtHistory_ByMove() {
+		$this->othello->initBoard();
+		$moveAtHistory = $this->othello->move(3, 3);
+		MyAssertion::assertSame(false, $moveAtHistory, "First Move @33 should not success");
+	}
+	public function testFirstMoveUnknown_ByMove() {
+		$this->othello->initBoard();
+		$moveUnknown = $this->othello->move(100, "a");
+		MyAssertion::assertSame(false, $moveUnknown, "First Move @100a should not success");
 	}
 }
 
