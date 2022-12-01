@@ -35,6 +35,10 @@ class OthelloLogic {
 		return $this->board;
 	}
 
+	public function getPlayer() {
+		return $this->player;
+	}
+
 	/*
 	 * < Put >
 	 *	Vertical 	-> 縦
