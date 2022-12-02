@@ -13,5 +13,9 @@
     ],
     "require": {
         "phpunit/phpunit": "9.*"
+    },
+    "require-dev": {
+        "phpunit/php-code-coverage": "^9.2",
+        "codedungeon/phpunit-result-printer": "^0.32.0"
     }
 }

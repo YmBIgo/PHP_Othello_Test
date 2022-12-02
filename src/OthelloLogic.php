@@ -9,6 +9,7 @@ use Exception;
 class OthelloLogic {
 
 	private $board;
+	private $display_board;
 	private $blank = 0;
 	private $black = 1;
 	private $white = 2;
@@ -35,6 +36,112 @@ class OthelloLogic {
 
 	public function getBoard() {
 		return $this->board;
+	}
+
+	public function getCandidateBoard() {
+		$enemy_player = $this->player == 2 ? 1 : 2;
+		[$enemy_player_array, $ally_player_array] = $this->getEnemyAndAllyPlayerArray($enemy_player);
+		$surroundCandidates =  $this->getSurroundCandidates($enemy_player_array);
+		$surroundCandidates = $this->traceSurroundCanMove($surroundCandidates);
+		$this->display_board = $this->board;
+		foreach ($surroundCandidates as $candidate ) {
+			$this->display_board[$candidate[0]][$candidate[1]] = 3;
+		}
+		if ( count($surroundCandidates) == 0 ) {
+			$this->player = $enemy_player;
+		}
+		return [$this->display_board, count($surroundCandidates)];
+	}
+
+	public function getEnemyAndAllyPlayerArray ($enemy_player) {
+		$enemy_player_array = array();
+		$ally_player_array = array();
+		for ($i = 0; $i < 8; $i++) {
+			for ($j = 0; $j < 8; $j++) {
+				if ($this->board[$i][$j] == $enemy_player) {
+					array_push($enemy_player_array, [$i, $j]);
+				} else if ( $this->board[$i][$j] == $this->getPlayer() ) {
+					array_push($ally_player_array, [$i, $j]);
+				}
+			}
+		}
+		return [$enemy_player_array, $ally_player_array];
+	}
+
+	public function traceSurroundCanMove($surroundCandidates) {
+		$candidate_array = array();
+		foreach ($surroundCandidates as $candidate) {
+			$checkBelow = $this->checkBelow($candidate[0], $candidate[1], $this->player, false);
+			$checkAbove = $this->checkAbove($candidate[0], $candidate[1], $this->player, false);
+			$checkLeft  = $this->checkLeft($candidate[0], $candidate[1], $this->player, false);
+			$checkRight = $this->checkRight($candidate[0], $candidate[1], $this->player, false);
+			$checkAboveLeft = $this->checkAboveLeft($candidate[0], $candidate[1], $this->player, false);
+			$checkAboveRight = $this->checkAboveRight($candidate[0], $candidate[1], $this->player, false);
+			$checkBelowLeft = $this->checkBelowLeft($candidate[0], $candidate[1], $this->player, false);
+			$checkBelowRight = $this->checkBelowRight($candidate[0], $candidate[1], $this->player, false);
+			if ( $checkBelow == false && $checkAbove == false && $checkLeft == false && $checkRight == false && $checkBelowLeft == false &&  $checkBelowRight == false && $checkAboveLeft == false && $checkAboveRight == false ) {
+				continue;
+			} else {
+				array_push($candidate_array, $candidate);
+			}
+		}
+		return $candidate_array;
+	}
+
+	public function getSurroundCandidates ($enemy_player_array) {
+		$surroundArray = array();
+		foreach ($enemy_player_array as $enemy_move) {
+			$surroundCandidate = $this->getSurroundMoves($enemy_move);
+			$surroundArray = array_merge($surroundArray, $surroundCandidate);
+		}
+		$surroundResult = array();
+		$surroundFlag = false;
+		foreach ($surroundArray as $surroundCandidate) {
+			$surroundFlag = false;
+			foreach ($surroundResult as $surroundCompare) {
+				if ( $surroundCompare[0] == $surroundCandidate[0] && $surroundCompare[1] == $surroundCandidate[1] ) {
+					$surroundFlag = true;
+					break;
+				}
+			}
+			if ($surroundFlag == false) {
+				array_push($surroundResult, $surroundCandidate);
+			}
+		}
+		usort($surroundResult, function($a, $b) {
+			return $a[0] > $b[0] ? 1 : -1;
+		});
+		return $surroundResult;
+	}
+
+	public function getSurroundMoves ($move) {
+		$aboveMove = [$move[0] - 1, $move[1]];
+		$belowMove = [$move[0] + 1, $move[1]];
+		$rightMove = [$move[0], $move[1] + 1];
+		$leftMove  = [$move[0], $move[1] - 1];
+		$aboveleftMove  = [$move[0] - 1, $move[1] - 1];
+		$aboverightMove = [$move[0] - 1, $move[1] + 1];
+		$belowleftMove  = [$move[0] + 1, $move[1] - 1];
+		$belowrightMove = [$move[0] + 1, $move[1] + 1];
+		$surroundMovesArray = [$aboveMove, $belowMove, $rightMove, $leftMove, $aboveleftMove, $aboverightMove, $belowleftMove, $belowrightMove];
+		$surroundMovesResult = array();
+		foreach ($surroundMovesArray as $surroundMove) {
+			if ($surroundMove[0] < 0 || $surroundMove[0] > 7 || $surroundMove[1] < 0 || $surroundMove[1] > 7) {
+				continue;
+			}
+			$hMoveCounter = 0;
+			foreach ( $this->moves_histories as $hMove ) {
+				// move has already appeared.
+				if ( $hMove[0] == $surroundMove[0] && $hMove[1] == $surroundMove[1] ) {
+					break;
+				}
+				$hMoveCounter += 1;
+				if (count($this->moves_histories) == $hMoveCounter) {
+					array_push($surroundMovesResult, $surroundMove);
+				}
+			}
+		}
+		return $surroundMovesResult;
 	}
 
 	public function getPlayer() {
@@ -272,7 +379,12 @@ class OthelloLogic {
 	}
 	public function commitDefeatedMoves($defeated_moves, $player) {
 		foreach ($defeated_moves as $d_move) {
-			$this->board[$d_move[0]][$d_move[1]] = $player;
+			// only permit stones that has already appeared.
+			foreach ($this->moves_histories as $h_move) {
+				if ($h_move[0] == $d_move[0] && $h_move[1] == $d_move[1]) {
+					$this->board[$d_move[0]][$d_move[1]] = $player;
+				}
+			}
 		}
 	}
 	public function commitDefeatedMove($defeated_move, $player) {
@@ -285,5 +397,16 @@ class OthelloLogic {
 			}
 		}
 		return false;
+	}
+	public function isGameFinished() {
+		$is_blank_exist_flag = false;
+		foreach ($this->board as $move_row) {
+			foreach ($move_row as $move) {
+				if ($move == 0) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 }

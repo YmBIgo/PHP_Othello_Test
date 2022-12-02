@@ -13,6 +13,16 @@ use Exception;
  *   board should be 2nd dimention array() expressed by 0, 1, 2
  */
 
+$expected_board_info =
+	"□□□□□□□□\n".
+	"□□□□□□□□\n".
+	"□□□□□□□□\n".
+	"□□□◯●□□□\n".
+	"□□□●◯□□□\n".
+	"□□□□□□□□\n".
+	"□□□□□□□□\n".
+	"□□□□□□□□\n";
+
 class Viewer {
 	public static function view_board($board_info) {
 		$board_result = "";
@@ -24,6 +34,8 @@ class Viewer {
 					$board_result = $board_result."●";
 				} elseif ($info == 2) {
 					$board_result = $board_result."◯";
+				} else if ($info == 3) {
+					$board_result = $board_result."×";
 				} else {
 					throw new Exception("Unknown info ".$info);
 				}
