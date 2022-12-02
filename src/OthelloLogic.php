@@ -154,7 +154,10 @@ class OthelloLogic {
 	 *	Horizontal 	-> 横
 	 */
 	public function move($vertical_pos, $horizontal_pos) {
-		if ((int)$vertical_pos < 1 || (int)$vertical_pos > 8 || (int)$horizontal_pos < 1 || (int)$horizontal_pos > 8) {
+		if (gettype($vertical_pos) != "integer" || gettype($vertical_pos) != "integer") {
+			return false;
+		}
+		if ((int)$vertical_pos < 0 || (int)$vertical_pos > 8 || (int)$horizontal_pos < 0 || (int)$horizontal_pos > 8) {
 			return false;
 		}
 		if ($this->player != 1 && $this->player != 2) {

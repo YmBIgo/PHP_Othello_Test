@@ -72,7 +72,6 @@ class BoardCandidateTest extends TestCase {
 		$this->othello_board->move(3, 6);
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
 		$this->assertSame($candidate_count, 5);
-		// ×
 		$expected_board_info =
 			"□□□□□□□□\n".
 			"□□□□□□□□\n".
@@ -94,6 +93,66 @@ class BoardCandidateTest extends TestCase {
 			"□□□●●□●□\n".
 			"□□××●×□×\n".
 			"□□□□×□□□\n".
+			"□□□□□□□□\n";
+		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+	}
+
+	public function testSurroudnCandidate3() {
+		$this->othello_board->initBoard();
+		$this->othello_board->move(2, 3);
+		$this->othello_board->move(2, 4);
+		$this->othello_board->move(1, 5);
+		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
+		$this->assertSame($candidate_count, 6);
+		$expected_board_info =
+			"□□□□□□□□\n".
+			"□□×□×●□□\n".
+			"□□×●●□□□\n".
+			"□□×●◯□□□\n".
+			"□□×●◯□□□\n".
+			"□□×□□□□□\n".
+			"□□□□□□□□\n".
+			"□□□□□□□□\n";
+		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+		$this->othello_board->move(1, 2);
+		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
+		$this->assertSame($candidate_count, 7);
+		$expected_board_info =
+			"□□□□□□□□\n".
+			"□□◯×□●□□\n".
+			"□□×◯●×□□\n".
+			"□□□●◯×□□\n".
+			"□□□●◯×□□\n".
+			"□□□□××□□\n".
+			"□□□□□□□□\n".
+			"□□□□□□□□\n";
+		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+		$this->othello_board->move(1, 3);
+		$this->othello_board->move(1, 4);
+		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
+		$this->assertSame($candidate_count, 8);
+		// ×
+		$expected_board_info =
+			"□×□×□×□□\n".
+			"□×◯◯◯●□□\n".
+			"□□□●◯×□□\n".
+			"□□□●◯×□□\n".
+			"□□□●◯×□□\n".
+			"□□□□□×□□\n".
+			"□□□□□□□□\n".
+			"□□□□□□□□\n";
+		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+		$this->othello_board->move(0, 3);
+		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
+		$this->assertSame($candidate_count, 7);
+		$expected_board_info =
+			"□□×●□□×□\n".
+			"□□◯●◯●×□\n".
+			"□□×●◯□□□\n".
+			"□□×●◯□□□\n".
+			"□□×●◯□□□\n".
+			"□□×□□□□□\n".
+			"□□□□□□□□\n".
 			"□□□□□□□□\n";
 		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
 	}
