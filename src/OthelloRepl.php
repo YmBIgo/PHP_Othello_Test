@@ -20,9 +20,9 @@ class OthelloRepl {
 		while(true) {
 			echo Viewer::view_board($this->othello->getBoard())."\n";
 			echo "It's your turn ".$this->othello->getPlayer()." \n";
-			echo "Please Input vertical count;\n";
+			echo "Please Input vertical position;\n";
 			$stdin_vertical = (int)trim(fgets(STDIN));
-			echo "Please Input horizontal count;\n";
+			echo "Please Input horizontal position;\n";
 			$stdin_horizontal = (int)trim(fgets(STDIN));
 			$is_success = $this->othello->move($stdin_vertical - 1, $stdin_horizontal - 1);
 			if ($is_success == true) {

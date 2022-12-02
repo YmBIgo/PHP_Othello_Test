@@ -81,7 +81,7 @@ class LogicFirstMoveTest extends MyPhpUnit {
 		echo $firstMoveLeftResult."\n\n";
 		*/
 	}
-	public function testFirstMoveRIght_ByMove() {
+	public function testFirstMoveRight_ByMove() {
 		$this->othello->initBoard();
 		$moveRight = $this->othello->move(3, 2);
 		MyAssertion::assertSame(true, $moveRight, "First Move @32 should return @33");

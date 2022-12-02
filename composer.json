@@ -11,5 +11,7 @@
             "email": "IgYmB0218LP@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "phpunit/phpunit": "9.*"
+    }
 }
