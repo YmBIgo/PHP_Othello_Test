@@ -11,5 +11,5 @@ markers:
   cd-fail: "❌ "
   cd-error: "🟡 "
   cd-skipped: "⏩ "
-  cd-incomplete: "🛑 "
-  cd-risky: "☠️ "
+  cd-incomplete: "☠️ "
+  cd-risky: "⚫️ "

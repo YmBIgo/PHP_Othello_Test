@@ -190,7 +190,7 @@ class OthelloLogic {
 		$defeated_enemy = array();
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
-			if ($check_vertical_pos == 0 || $check_vertical_pos == 7) { break; }
+			if ($check_vertical_pos == 7) { break; }
 			if ( $this->board[$check_vertical_pos + 1][$horizontal_pos] == $enemy_player ) {
 				$check_vertical_pos = $check_vertical_pos + 1;
 				array_push($defeated_enemy, [$check_vertical_pos, $horizontal_pos]);
@@ -215,7 +215,7 @@ class OthelloLogic {
 		$defeated_enemy = array();
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
-			if ($check_vertical_pos == 0 || $check_vertical_pos == 0) { break; }
+			if ($check_vertical_pos == 0) { break; }
 			if ( $this->board[$check_vertical_pos - 1][$horizontal_pos] == $enemy_player ) {
 				$check_vertical_pos = $check_vertical_pos - 1;
 				array_push($defeated_enemy, [$check_vertical_pos, $horizontal_pos]);
@@ -238,7 +238,7 @@ class OthelloLogic {
 		$defeated_enemy = array();
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
-			if ($check_horizontal_pos == 0 || $check_horizontal_pos == 7) { break; }
+			if ($check_horizontal_pos == 0) { break; }
 			if ($this->board[$vertical_pos][$check_horizontal_pos - 1] == $enemy_player) {
 				$check_horizontal_pos = $check_horizontal_pos - 1;
 				array_push($defeated_enemy, [$vertical_pos, $check_horizontal_pos]);
@@ -261,7 +261,7 @@ class OthelloLogic {
 		$defeated_enemy = array();
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
-			if ($check_horizontal_pos == 0 || $check_horizontal_pos == 7) { break; }
+			if ($check_horizontal_pos == 7) { break; }
 			if ($this->board[$vertical_pos][$check_horizontal_pos + 1] == $enemy_player) {
 				$check_horizontal_pos = $check_horizontal_pos + 1;
 				array_push($defeated_enemy, [$vertical_pos, $check_horizontal_pos]);
@@ -285,7 +285,7 @@ class OthelloLogic {
 		$defeated_enemy = array();
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
-			if ($check_horizontal_pos == 0 || $check_horizontal_pos == 7 || $check_vertical_pos == 0 || $check_vertical_pos == 7) { break; }
+			if ($check_horizontal_pos == 0 || $check_vertical_pos == 7) { break; }
 			if ($this->board[$check_vertical_pos+1][$check_horizontal_pos-1] == $enemy_player) {
 				$check_vertical_pos = $check_vertical_pos + 1 ;
 				$check_horizontal_pos = $check_horizontal_pos - 1 ;
@@ -310,7 +310,7 @@ class OthelloLogic {
 		$defeated_enemy = array();
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
-			if ($check_horizontal_pos == 0 || $check_horizontal_pos == 7 || $check_vertical_pos == 0 || $check_vertical_pos == 7) { break; }
+			if ($check_horizontal_pos == 7 || $check_vertical_pos == 7) { break; }
 			if ($this->board[$check_vertical_pos+1][$check_horizontal_pos+1] == $enemy_player) {
 				$check_vertical_pos = $check_vertical_pos + 1;
 				$check_horizontal_pos = $check_horizontal_pos + 1;
@@ -335,7 +335,7 @@ class OthelloLogic {
 		$defeated_enemy = array();
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
-			if ($check_horizontal_pos == 0 || $check_horizontal_pos == 7 || $check_vertical_pos == 0 || $check_vertical_pos == 7) { break; }
+			if ($check_horizontal_pos == 0 || $check_vertical_pos == 0) { break; }
 			if ($this->board[$check_vertical_pos-1][$check_horizontal_pos-1] == $enemy_player) {
 				$check_vertical_pos = $check_vertical_pos - 1;
 				$check_horizontal_pos = $check_horizontal_pos - 1;
@@ -360,7 +360,7 @@ class OthelloLogic {
 		$defeated_enemy = array();
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
-			if ($check_horizontal_pos == 0 || $check_horizontal_pos == 7 || $check_vertical_pos == 0 || $check_vertical_pos == 7) { break; }
+			if ($check_horizontal_pos == 7 || $check_vertical_pos == 0) { break; }
 			if ($this->board[$check_vertical_pos-1][$check_horizontal_pos+1] == $enemy_player) {
 				$check_vertical_pos = $check_vertical_pos - 1;
 				$check_horizontal_pos = $check_horizontal_pos + 1;
