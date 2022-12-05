@@ -175,6 +175,10 @@ class OthelloLogic {
 		return $this->player;
 	}
 
+	public function getGameHistory() {
+		return $this->game_history;
+	}
+
 	/*
 	 * < Put >
 	 *	Vertical 	-> 縦

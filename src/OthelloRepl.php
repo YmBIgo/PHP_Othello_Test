@@ -61,7 +61,7 @@ class OthelloRepl {
 				$choose_player_flag = false;
 				$chosen_player = 1;
 			} else if ($stdin_player == 2) {
-				$chosen_player = false;
+				$choose_player_flag = false;
 				$chosen_player = 2;
 			} else {
 				echo "Please Input correct input (1 or 2).\n";
@@ -93,11 +93,13 @@ class OthelloRepl {
 				}
 			}
 		}
+		[$display_board, $candidate_moves] = $this->othello->getCandidateBoard();
+		echo Viewer::view_board($display_board);
 		$this->othello->getGameResult();
 	}
 
 }
 
 $repl = new OthelloRepl();
-// $repl->random_game();
-$repl->play_with_computer();
+$repl->random_game();
+// $repl->play_with_computer();
