@@ -9,13 +9,13 @@ use Coffeecup\Othello\Viewer;
 
 $othello_board = new OthelloLogic();
 $othello_board->initBoard();
-$othello_board->move(2, 3);
-$othello_board->move(2, 4);
-$othello_board->move(1, 5);
-$othello_board->move(1, 2);
-$othello_board->move(1, 3);
-$othello_board->move(1, 4);
-$othello_board->move(0, 3);
+$othello_board->move(3, 2);
+$othello_board->move(4, 2);
+$othello_board->move(5, 1);
+$othello_board->move(2, 1);
+$othello_board->move(3, 1);
+$othello_board->move(4, 1);
+$othello_board->move();
 
 /*
 $enemy_player = $othello_board->getPlayer() == 2 ? 1 : 2;
