@@ -64,8 +64,20 @@ class OthelloLogic {
 				}
 			}
 		}
+		
 		echo "\n\n Blank = ".$blank_count;
 		echo "\n White = ".$white_count;
+		echo "\n\n";
+
+		$othello_history = "";
+		$othello_horizontal_alphabet_array = array("A", "B", "C", "D", "E", "F", "G", "H");
+		foreach ($this->game_history as $history) {
+			$horizontal_pos = $history[1];
+			$horizontal_string = $othello_horizontal_alphabet_array[$horizontal_pos];
+			$vertical_string = $history[0] + 1;
+			$othello_history = $othello_history.$horizontal_string.$vertical_string;
+		}
+		echo $othello_history;
 	}
 
 	public function getEnemyAndAllyPlayerArray ($enemy_player) {
@@ -197,6 +209,7 @@ class OthelloLogic {
 		}
 		$this->commitDefeatedMove([$vertical_pos, $horizontal_pos], $this->player);
 		array_push($this->moves_histories, [$vertical_pos, $horizontal_pos]);
+		array_push($this->game_history, [$vertical_pos, $horizontal_pos]);
 
 		$this->player = $this->player == 1 ? 2 : 1;
 		[$display_board, $candidate_count] = $this->getCandidateBoard();
