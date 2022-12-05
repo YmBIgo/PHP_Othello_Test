@@ -99,7 +99,7 @@ class BoardEdgeTest extends TestCase {
 		$this->othello_board->move(3, 6);
 		$this->othello_board->move(4, 6);
 		//
-		$result = $this->othello_board->move(2, 7);
+		$result = $this->othello_board->move(2, 7)[0];
 		$this->assertSame($result, false);
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
 		$this->assertSame($candidate_count, 7);
@@ -122,7 +122,7 @@ class BoardEdgeTest extends TestCase {
 		$this->othello_board->move(3, 6);
 		$this->othello_board->move(4, 6);
 		//
-		$result = $this->othello_board->move(0, 7);
+		$result = $this->othello_board->move(0, 7)[0];
 		$this->assertSame($result, false);
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
 		$this->assertSame($candidate_count, 7);
@@ -225,7 +225,7 @@ class BoardEdgeTest extends TestCase {
 		$this->othello_board->move(1, 2);
 		$this->othello_board->move(1, 3);
 		$this->othello_board->move(1, 4);
-		$result = $this->othello_board->move(0, 2);
+		$result = $this->othello_board->move(0, 2)[0];
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
 		$expected_board_info =
 			"□×□×□×□□\n".
@@ -246,7 +246,7 @@ class BoardEdgeTest extends TestCase {
 		$this->othello_board->move(1, 2);
 		$this->othello_board->move(1, 3);
 		$this->othello_board->move(1, 4);
-		$result = $this->othello_board->move(0, 0);
+		$result = $this->othello_board->move(0, 0)[0];
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
 		$expected_board_info =
 			"□×□×□×□□\n".
@@ -346,7 +346,7 @@ class BoardEdgeTest extends TestCase {
 		$this->othello_board->move(2, 1);
 		$this->othello_board->move(3, 1);
 		$this->othello_board->move(4, 1);
-		$result = $this->othello_board->move(4, 0);
+		$result = $this->othello_board->move(4, 0)[0];
 		$this->assertSame($result, false);
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
 		$this->assertSame($candidate_count, 8);
@@ -369,7 +369,7 @@ class BoardEdgeTest extends TestCase {
 		$this->othello_board->move(2, 1);
 		$this->othello_board->move(3, 1);
 		$this->othello_board->move(4, 1);
-		$result = $this->othello_board->move(0, 0);
+		$result = $this->othello_board->move(0, 0)[0];
 		$this->assertSame($result, false);
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
 		$this->assertSame($candidate_count, 8);
@@ -471,7 +471,7 @@ class BoardEdgeTest extends TestCase {
 		$this->othello_board->move(6, 5);
 		$this->othello_board->move(6, 4);
 		$this->othello_board->move(6, 3);
-		$result = $this->othello_board->move(7, 3);
+		$result = $this->othello_board->move(7, 3)[0];
 		$this->assertSame($result, false);
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
 		$this->assertSame($candidate_count, 8);
@@ -494,7 +494,7 @@ class BoardEdgeTest extends TestCase {
 		$this->othello_board->move(6, 5);
 		$this->othello_board->move(6, 4);
 		$this->othello_board->move(6, 3);
-		$result = $this->othello_board->move(7, 7);
+		$result = $this->othello_board->move(7, 7)[0];
 		$this->assertSame($result, false);
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
 		$this->assertSame($candidate_count, 8);

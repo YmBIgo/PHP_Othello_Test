@@ -22,7 +22,7 @@ class BoardTest extends TestCase {
 	/* Test Case 1 ~ 6 */
 	public function testBoardCase01() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(3, 3);
+		$result = $this->othello_board->move(3, 3)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -38,7 +38,7 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase02() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(5, 4);
+		$result = $this->othello_board->move(5, 4)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -54,7 +54,7 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase03() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(2, 3);
+		$result = $this->othello_board->move(2, 3)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -70,7 +70,7 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase04() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(3, 2);
+		$result = $this->othello_board->move(3, 2)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -86,7 +86,7 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase05() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(4, 5);
+		$result = $this->othello_board->move(4, 5)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -102,7 +102,7 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase06() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(5, 5);
+		$result = $this->othello_board->move(5, 5)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -121,9 +121,9 @@ class BoardTest extends TestCase {
 
 	public function testBoardCase07() {
 		$this->othello_board->initBoard();
-		$result1 = $this->othello_board->move(5, 4);
+		$result1 = $this->othello_board->move(5, 4)[0];
 		$this->AssertSame($result1, true);
-		$result2 = $this->othello_board->move(5, 5);
+		$result2 = $this->othello_board->move(5, 5)[0];
 		$this->AssertSame($result2, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -139,9 +139,9 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase08() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(2, 3);
+		$result = $this->othello_board->move(2, 3)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 2);
+		$result = $this->othello_board->move(2, 2)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -157,11 +157,11 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase09() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(5, 4);
+		$result = $this->othello_board->move(5, 4)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 3);
+		$result = $this->othello_board->move(5, 3)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(6, 2);
+		$result = $this->othello_board->move(6, 2)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -177,11 +177,11 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase10() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(2, 3);
+		$result = $this->othello_board->move(2, 3)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 4);
+		$result = $this->othello_board->move(2, 4)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(1, 5);
+		$result = $this->othello_board->move(1, 5)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -197,11 +197,11 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase11() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(5, 4);
+		$result = $this->othello_board->move(5, 4)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 5);
+		$result = $this->othello_board->move(5, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 4);
+		$result = $this->othello_board->move(5, 4)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -217,11 +217,11 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase12() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(5, 4);
+		$result = $this->othello_board->move(5, 4)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 5);
+		$result = $this->othello_board->move(5, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(0, 1);
+		$result = $this->othello_board->move(0, 1)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -237,11 +237,11 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase13() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(5, 4);
+		$result = $this->othello_board->move(5, 4)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 3);
+		$result = $this->othello_board->move(5, 3)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 2);
+		$result = $this->othello_board->move(5, 2)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -260,11 +260,11 @@ class BoardTest extends TestCase {
 
 	public function testBoardCase14() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(2, 3);
+		$result = $this->othello_board->move(2, 3)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 4);
+		$result = $this->othello_board->move(2, 4)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 5);
+		$result = $this->othello_board->move(2, 5)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -280,13 +280,13 @@ class BoardTest extends TestCase {
 	}	
 	public function testBoardCase15() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(2, 3);
+		$result = $this->othello_board->move(2, 3)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 4);
+		$result = $this->othello_board->move(2, 4)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 5);
+		$result = $this->othello_board->move(2, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(1, 4);
+		$result = $this->othello_board->move(1, 4)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -302,11 +302,11 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase16() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(3, 2);
+		$result = $this->othello_board->move(3, 2)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(4, 2);
+		$result = $this->othello_board->move(4, 2)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 2);
+		$result = $this->othello_board->move(5, 2)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -322,13 +322,13 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase17() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(3, 2);
+		$result = $this->othello_board->move(3, 2)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(4, 2);
+		$result = $this->othello_board->move(4, 2)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 2);
+		$result = $this->othello_board->move(5, 2)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(4, 1);
+		$result = $this->othello_board->move(4, 1)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -344,11 +344,11 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase18() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(4, 5);
+		$result = $this->othello_board->move(4, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(3, 5);
+		$result = $this->othello_board->move(3, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 5);
+		$result = $this->othello_board->move(2, 5)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -364,13 +364,13 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase19() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(4, 5);
+		$result = $this->othello_board->move(4, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(3, 5);
+		$result = $this->othello_board->move(3, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 5);
+		$result = $this->othello_board->move(2, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(3, 6);
+		$result = $this->othello_board->move(3, 6)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -386,13 +386,13 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase20() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(2, 3);
+		$result = $this->othello_board->move(2, 3)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 4);
+		$result = $this->othello_board->move(2, 4)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 5);
+		$result = $this->othello_board->move(2, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(1, 3);
+		$result = $this->othello_board->move(1, 3)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -408,13 +408,13 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase21() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(2, 3);
+		$result = $this->othello_board->move(2, 3)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 4);
+		$result = $this->othello_board->move(2, 4)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 5);
+		$result = $this->othello_board->move(2, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 2);
+		$result = $this->othello_board->move(5, 2)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -430,13 +430,13 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase22() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(2, 3);
+		$result = $this->othello_board->move(2, 3)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 4);
+		$result = $this->othello_board->move(2, 4)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 5);
+		$result = $this->othello_board->move(2, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 2);
+		$result = $this->othello_board->move(2, 2)[0];
 		$this->AssertSame($result, true);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -452,13 +452,13 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase23() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(3, 2);
+		$result = $this->othello_board->move(3, 2)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(4, 2);
+		$result = $this->othello_board->move(4, 2)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 2);
+		$result = $this->othello_board->move(5, 2)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 4);
+		$result = $this->othello_board->move(5, 4)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -477,13 +477,13 @@ class BoardTest extends TestCase {
 
 	public function testBoardCase24() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(5, 4);
+		$result = $this->othello_board->move(5, 4)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 3);
+		$result = $this->othello_board->move(5, 3)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(6, 2);
+		$result = $this->othello_board->move(6, 2)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(6, 4);
+		$result = $this->othello_board->move(6, 4)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -499,13 +499,13 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase25() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(2, 3);
+		$result = $this->othello_board->move(2, 3)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 4);
+		$result = $this->othello_board->move(2, 4)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 5);
+		$result = $this->othello_board->move(2, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(3, 5);
+		$result = $this->othello_board->move(3, 5)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -521,11 +521,11 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase26() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(2, 3);
+		$result = $this->othello_board->move(2, 3)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(4, 2);
+		$result = $this->othello_board->move(4, 2)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(4, 5);
+		$result = $this->othello_board->move(4, 5)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -541,13 +541,13 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase27() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(4, 5);
+		$result = $this->othello_board->move(4, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(3, 5);
+		$result = $this->othello_board->move(3, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 5);
+		$result = $this->othello_board->move(2, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 4);
+		$result = $this->othello_board->move(5, 4)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -563,7 +563,7 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase28() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(10, 10);
+		$result = $this->othello_board->move(10, 10)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -579,7 +579,7 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase29() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move("a", "b");
+		$result = $this->othello_board->move("a", "b")[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -595,11 +595,11 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase30() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(5, 4);
+		$result = $this->othello_board->move(5, 4)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 3);
+		$result = $this->othello_board->move(5, 3)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(5, 6);
+		$result = $this->othello_board->move(5, 6)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -615,11 +615,11 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase31() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(2, 3);
+		$result = $this->othello_board->move(2, 3)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 4);
+		$result = $this->othello_board->move(2, 4)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(2, 1);
+		$result = $this->othello_board->move(2, 1)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -635,11 +635,11 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase32() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(3, 2);
+		$result = $this->othello_board->move(3, 2)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(4, 2);
+		$result = $this->othello_board->move(4, 2)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(6, 4);
+		$result = $this->othello_board->move(6, 4)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".
@@ -655,11 +655,11 @@ class BoardTest extends TestCase {
 	}
 	public function testBoardCase33() {
 		$this->othello_board->initBoard();
-		$result = $this->othello_board->move(4, 5);
+		$result = $this->othello_board->move(4, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(3, 5);
+		$result = $this->othello_board->move(3, 5)[0];
 		$this->AssertSame($result, true);
-		$result = $this->othello_board->move(1, 3);
+		$result = $this->othello_board->move(1, 3)[0];
 		$this->AssertSame($result, false);
 		$expected_board_info =
 			"□□□□□□□□\n".

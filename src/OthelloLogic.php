@@ -15,6 +15,7 @@ class OthelloLogic {
 	private $white = 2;
 	private $player = 1;
 	private $moves_histories;
+	private $game_history;
 
 	public function __construct() {
 	}
@@ -32,6 +33,7 @@ class OthelloLogic {
 		];
 		$this->player = 1;
 		$this->moves_histories = [[3, 3], [3, 4], [4, 3], [4, 4]];
+		$this->game_history = [];
 	}
 
 	public function getBoard() {
@@ -47,10 +49,23 @@ class OthelloLogic {
 		foreach ($surroundCandidates as $candidate ) {
 			$this->display_board[$candidate[0]][$candidate[1]] = 3;
 		}
-		if ( count($surroundCandidates) == 0 ) {
-			$this->player = $enemy_player;
+		return [$this->display_board, count($surroundCandidates), $surroundCandidates];
+	}
+
+	public function getGameResult() {
+		$blank_count = 0;
+		$white_count = 0;
+		foreach ($this->board as $board_row) {
+			foreach ($board_row as $move) {
+				if ($move == 1) {
+					$blank_count += 1;
+				} else if ($move == 2) {
+					$white_count += 1;
+				}
+			}
 		}
-		return [$this->display_board, count($surroundCandidates)];
+		echo "\n\n Blank = ".$blank_count;
+		echo "\n White = ".$white_count;
 	}
 
 	public function getEnemyAndAllyPlayerArray ($enemy_player) {
@@ -155,10 +170,10 @@ class OthelloLogic {
 	 */
 	public function move($vertical_pos, $horizontal_pos) {
 		if (gettype($vertical_pos) != "integer" || gettype($vertical_pos) != "integer") {
-			return false;
+			return [false, true];
 		}
 		if ((int)$vertical_pos < 0 || (int)$vertical_pos > 8 || (int)$horizontal_pos < 0 || (int)$horizontal_pos > 8) {
-			return false;
+			return [false, true];
 		}
 		if ($this->player != 1 && $this->player != 2) {
 			throw new Exception("Unknown player;");
@@ -166,7 +181,7 @@ class OthelloLogic {
 		$checkMoveHistories = $this->checkMoveHistories($vertical_pos, $horizontal_pos);
 
 		if ($checkMoveHistories == true) {
-			return false;
+			return [false, true];
 		}
 
 		$checkBelow = $this->checkBelow($vertical_pos, $horizontal_pos, $this->player, true);
@@ -178,12 +193,32 @@ class OthelloLogic {
 		$checkAboveLeft = $this->checkAboveLeft($vertical_pos, $horizontal_pos, $this->player, true);
 		$checkAboveRight = $this->checkAboveRight($vertical_pos, $horizontal_pos, $this->player, true);
 		if ($checkBelow == false && $checkAbove == false && $checkLeft == false && $checkRight == false && $checkBelowLeft == false &&  $checkBelowRight == false && $checkAboveLeft == false && $checkAboveRight == false ) {
-			return false;
+			return [false, true];
 		}
 		$this->commitDefeatedMove([$vertical_pos, $horizontal_pos], $this->player);
 		array_push($this->moves_histories, [$vertical_pos, $horizontal_pos]);
+
 		$this->player = $this->player == 1 ? 2 : 1;
-		return true;
+		[$display_board, $candidate_count] = $this->getCandidateBoard();
+		if ($candidate_count != 0) {
+			return [true, true];
+		} else {
+			$this->player = $this->player == 1 ? 2 : 1;
+			[$display_board2, $candidate_count2] = $this->getCandidateBoard();
+			if ($candidate_count2 == 0) {
+				return [true, false];
+			} else {
+				return [true, true];
+			}
+		}
+	}
+
+	public function random_move() {
+		[$display_board, $candidate_count, $candidate_moves] = $this->getCandidateBoard();
+		$selected_candidate_id = rand(0, count($candidate_moves) - 1);
+		$selected_move = $candidate_moves[$selected_candidate_id];
+		$game_result = $this->move($selected_move[0], $selected_move[1]);
+		return $game_result;
 	}
 
 	public function checkBelow($vertical_pos, $horizontal_pos, $player, $is_commit) {

@@ -19,29 +19,18 @@ class OthelloRepl {
 	}
 
 	public function main() {
-		while($isGameFinished == false) {
+		while($this->isGameFinished == false) {
 			[$display_board, $candidate_moves] = $this->othello->getCandidateBoard();
 			echo Viewer::view_board($display_board)."\n";
-			if ( $candidate_moves == 0 ) {
-				$past_player = $this->othello->getPlayer() == 1 ? 2 : 1; 
-				echo "Player".$past_player." has no way to move.\nnext turn\n\n";
-				$passCount += 1;
-				if ($passCount == 2 ) {
-					$isGameFinished = true;
-				}
-				continue;
-			}
-			$passCount = 0;
-			$isGameFinished = $this->othello->isGameFinished();
-			if ($isGameFinished == true) {
-				break;
-			}
 			echo "It's your turn ".$this->othello->getPlayer()." \n";
 			echo "Please Input vertical position;\n";
 			$stdin_vertical = (int)trim(fgets(STDIN));
 			echo "Please Input horizontal position;\n";
 			$stdin_horizontal = (int)trim(fgets(STDIN));
-			$is_success = $this->othello->move($stdin_vertical - 1, $stdin_horizontal - 1);
+			[$is_success, $is_game_continue] = $this->othello->move($stdin_vertical - 1, $stdin_horizontal - 1);
+			if ($is_game_continue == false ) {
+				$this->isGameFinished = false;
+			}
 			if ($is_success == true) {
 				echo "\n";
 			} else {
@@ -49,7 +38,20 @@ class OthelloRepl {
 			}
 		}
 	}
+
+	public function random_game() {
+		while($this->isGameFinished == false) {
+			[$is_success, $is_game_continue] = $this->othello->random_move();
+			if ($is_game_continue == false ) {
+				[$display_board, $candidate_moves] = $this->othello->getCandidateBoard();
+				echo Viewer::view_board($display_board);
+				$this->isGameFinished = true;
+			}
+		}
+		$this->othello->getGameResult();
+	}
+
 }
 
 $repl = new OthelloRepl();
-$repl->main();
+$repl->random_game();
