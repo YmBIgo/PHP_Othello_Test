@@ -42,7 +42,13 @@ class OthelloRepl {
 
 	public function random_game() {
 		while($this->isGameFinished == false) {
-			[$is_success, $is_game_continue] = $this->othello->random_move();
+			$is_success = ""; 
+			$is_game_continue = "";
+			if ($this->othello->getPlayer() == 1) {
+				[$is_success, $is_game_continue] = $this->othello->random_move2();
+			} else if ($this->othello->getPlayer() == 2) {
+				[$is_success, $is_game_continue] = $this->othello->random_move();
+			}
 			if ($is_game_continue == false ) {
 				[$display_board, $candidate_moves] = $this->othello->getCandidateBoard();
 				echo Viewer::view_board($display_board);
@@ -102,5 +108,5 @@ class OthelloRepl {
 }
 
 $repl = new OthelloRepl();
-// $repl->random_game();
-$repl->play_with_computer();
+$repl->random_game();
+// $repl->play_with_computer();

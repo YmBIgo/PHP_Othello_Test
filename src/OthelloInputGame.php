@@ -80,13 +80,15 @@ class OthelloInputGame {
 				echo "Something wrong happen (check especially your history data).";
 			}
 		}
-		[$display_board, $candidate_moves] = $this->othello->getCandidateBoard();
-		// echo Viewer::view_board($display_board);
 	}
 
 	public function reStartGameMove($vertical_pos, $horizontal_pos) {
-		
 	} 
+
+	public function viewGameBoard() {
+		[$display_board, $candidate_moves] = $this->othello->getCandidateBoard();
+		echo Viewer::view_board($display_board);
+	}
 }
 
 // Input Example 1 : E6D6C4F6C7C6D7E3F5G6G4C5F4C3B7B6B4A8E7G5A5A7H6B8H5F3B5B3D3D8E2D2C8G3A4A6C2A3A2A1H3H4E8F8F7G8G7B2H8H7F2E1D1B1C1G1F1H2H1G2
@@ -98,6 +100,8 @@ class OthelloInputGame {
 /*
 $game = new OthelloInputGame();
 // $game->inputGameByCommandLine();
-$game->inputGame("F5F6E6F4C3D6F3C4C5B4A5A3C6B5A6B6G4E3G5A4A2D3B3C2E2D2A7F1F7G6H5F2E7C7D7H3C8E8H4G3H2D8F8G7D1H6H8H1E1C1B2G1G2B7G8H7A8B8A1B1");
+$game->inputGame("C4E3F5C6C5G6G5E6C7C3C2B4A3A4D3E2D2D6D7G4F4E1C1F6F2F1F7E8B3G3F3D8E7C8H3H4H5B5");
 $game->startGame();
+$game->viewGameBoard();
 */
+
