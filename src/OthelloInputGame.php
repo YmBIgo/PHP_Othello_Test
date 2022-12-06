@@ -83,6 +83,10 @@ class OthelloInputGame {
 		[$display_board, $candidate_moves] = $this->othello->getCandidateBoard();
 		// echo Viewer::view_board($display_board);
 	}
+
+	public function reStartGameMove($vertical_pos, $horizontal_pos) {
+		
+	} 
 }
 
 // Input Example 1 : E6D6C4F6C7C6D7E3F5G6G4C5F4C3B7B6B4A8E7G5A5A7H6B8H5F3B5B3D3D8E2D2C8G3A4A6C2A3A2A1H3H4E8F8F7G8G7B2H8H7F2E1D1B1C1G1F1H2H1G2

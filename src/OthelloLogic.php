@@ -275,7 +275,7 @@ class OthelloLogic {
 		$sanitize_near_corner_array = $this->checkHasNearCorner($pick_corner_array);
 		$game_history_len = count($this->game_history);
 		$move_array = array();
-		if ($game_history_len < 31) {
+		if ($game_history_len < 41) {
 			$move_array = $this->checkSmallestOrBiggestDefeatMove($sanitize_near_corner_array, $candidate_defeat_count, true);
 		} else {
 			$move_array = $this->checkSmallestOrBiggestDefeatMove($sanitize_near_corner_array, $candidate_defeat_count, false);
