@@ -216,6 +216,15 @@ class OthelloLogic {
 	 *	Horizontal 	-> 横
 	 */
 	public function move($vertical_pos, $horizontal_pos) {
+		[$display_board_1, $candidate_count_1] = $this->getCandidateBoard();
+		if ($candidate_count_1 == 0) {
+			$this->player = $this->player == 1 ? 2 : 1;
+			[$display_board_2, $candidate_count_2] = $this->getCandidateBoard();
+			if ($candidate_count_2 == 0) {
+				return [false, false];
+			}
+			$this->player = $this->player == 1 ? 2 : 1;
+		}
 		if (gettype($vertical_pos) != "integer" || gettype($vertical_pos) != "integer") {
 			return [false, true];
 		}

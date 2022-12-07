@@ -456,7 +456,8 @@ class BoardCornerTest extends TestCase {
 		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
 	}
 	/* Test Case 66 ~ */
-	public function testBoardCase66() {
+	public function skipped_testBoardCase66() {
+		$this->markTestSkipped("違う隅のテスト（１８をテストしたい）だったのでスキップ");
 		$this->othello_board->initBoard();
 		$this->othello_board->move(5, 4);
 		$this->othello_board->move(5, 3);
@@ -496,7 +497,8 @@ class BoardCornerTest extends TestCase {
 			"□□××●◯◯◯\n";
 		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
 	}
-	public function testBoardCase67() {
+	public function skipped_testBoardCase67() {
+		$this->markTestSkipped("違う隅のテスト（１８をテストしたい）だったのでスキップ");
 		$this->othello_board->initBoard();
 		$this->othello_board->move(5, 4);
 		$this->othello_board->move(5, 3);
@@ -523,7 +525,8 @@ class BoardCornerTest extends TestCase {
 			"□□×□●◯●□\n";
 		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
 	}
-	public function testBoardCase68() {
+	public function skipped_testBoardCase68() {
+		$this->markTestSkipped("違う隅のテスト（１８をテストしたい）だったのでスキップ");
 		$this->othello_board->initBoard();
 		$this->othello_board->move(5, 4);
 		$this->othello_board->move(5, 3);
@@ -564,7 +567,8 @@ class BoardCornerTest extends TestCase {
 			"□×□□●×●●\n";
 		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
 	}
-	public function testBoardCase69() {
+	public function skipped_testBoardCase69() {
+		$this->markTestSkipped("違う隅のテスト（１８をテストしたい）だったのでスキップ");
 		$this->othello_board->initBoard();
 		$this->othello_board->move(5, 4);
 		$this->othello_board->move(5, 3);
@@ -604,6 +608,158 @@ class BoardCornerTest extends TestCase {
 			"□□×◯●◯◯◯\n".
 			"□□●◯◯●×◯\n".
 			"□□×××□●◯\n";
+		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+	}
+	public function testBoardCase66() {
+		//
+		$this->othello_board->initBoard();
+		$this->othello_board->move(4, 5);
+		$this->othello_board->move(3, 5);
+		$this->othello_board->move(2, 6);
+		$this->othello_board->move(5, 6);
+		$this->othello_board->move(4, 6);
+		$this->othello_board->move(3, 6);
+		$this->othello_board->move(2, 5);
+		$this->othello_board->move(1, 6);
+		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
+		$this->assertSame($candidate_count, 10);
+		$expected_board_info =
+			"□□□□□□□×\n".
+			"□□□□□□◯×\n".
+			"□□××□●◯×\n".
+			"□□×◯●●◯×\n".
+			"□□□●●●◯×\n".
+			"□□□□□□◯×\n".
+			"□□□□□□□×\n".
+			"□□□□□□□□\n";
+		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+		$result = $this->othello_board->move(0, 7)[0];
+		$this->assertSame($result, true);
+		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
+		$this->assertSame($candidate_count, 8);
+		$expected_board_info =
+			"□□□□□□×●\n".
+			"□□□□×□●□\n".
+			"□□□××●◯□\n".
+			"□□□◯●●◯□\n".
+			"□□×●●●◯□\n".
+			"□□□×××◯□\n".
+			"□□□□□□□□\n".
+			"□□□□□□□□\n";
+		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+	}
+	public function testBoardCase67() {
+		//
+		$this->othello_board->initBoard();
+		$this->othello_board->move(4, 5);
+		$this->othello_board->move(3, 5);
+		$this->othello_board->move(2, 6);
+		$this->othello_board->move(5, 6);
+		$this->othello_board->move(4, 6);
+		$this->othello_board->move(3, 6);
+		$this->othello_board->move(2, 5);
+		$result = $this->othello_board->move(0, 7)[0];
+		$this->assertSame($result, false);
+		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
+		$this->assertSame($candidate_count, 8);
+		$expected_board_info =
+			"□□□□□□□□\n".
+			"□□□□×□×□\n".
+			"□□□××●●□\n".
+			"□□□◯●●◯□\n".
+			"□□×●●●◯□\n".
+			"□□□×××◯□\n".
+			"□□□□□□□□\n".
+			"□□□□□□□□\n";
+		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+	}
+	public function testBoardCase68() {
+		//
+		$this->othello_board->initBoard();
+		$this->othello_board->move(4, 5);
+		$this->othello_board->move(3, 5);
+		$this->othello_board->move(2, 6);
+		$this->othello_board->move(5, 6);
+		$this->othello_board->move(4, 6);
+		$this->othello_board->move(3, 6);
+		$this->othello_board->move(2, 5);
+		$this->othello_board->move(1, 4);
+		$this->othello_board->move(2, 7);
+		$this->othello_board->move(3, 7);
+		$this->othello_board->move(1, 5);
+		$this->othello_board->move(1, 7);
+		$this->othello_board->move(4, 7);
+		$this->othello_board->move(0, 4);
+		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
+		$this->assertSame($candidate_count, 11);
+		$expected_board_info =
+			"□□□×◯×□×\n".
+			"□□□□◯◯×◯\n".
+			"□□×××●◯◯\n".
+			"□□×◯◯●●◯\n".
+			"□□□●●●●●\n".
+			"□□□□□□◯□\n".
+			"□□□□□×××\n".
+			"□□□□□□□□\n";
+		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+		$result = $this->othello_board->move(0, 7)[0];
+		$this->assertSame($result, true);
+		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
+		$this->assertSame($candidate_count, 6);
+		$expected_board_info =
+			"□□□□◯□□●\n".
+			"□□□□◯◯×●\n".
+			"□□□□×●◯●\n".
+			"□□□◯◯●●●\n".
+			"□□□●●●●●\n".
+			"□□××××◯□\n".
+			"□□□□□□□□\n".
+			"□□□□□□□□\n";
+		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+	}
+	public function testBoardCase69() {
+		//
+		$this->othello_board->initBoard();
+		$this->othello_board->move(4, 5);
+		$this->othello_board->move(3, 5);
+		$this->othello_board->move(2, 6);
+		$this->othello_board->move(5, 6);
+		$this->othello_board->move(4, 6);
+		$this->othello_board->move(3, 6);
+		$this->othello_board->move(2, 5);
+		$this->othello_board->move(1, 4);
+		$this->othello_board->move(1, 5);
+		$this->othello_board->move(2, 4);
+		$this->othello_board->move(0, 4);
+		$this->othello_board->move(0, 5);
+		$this->othello_board->move(0, 6);
+		$this->othello_board->move(0, 3);
+		$this->othello_board->move(2, 7);
+		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
+		$this->assertSame($candidate_count, 12);
+		$expected_board_info = 
+			"□□□◯●●●×\n".
+			"□□□×◯●××\n".
+			"□□□×●◯●●\n".
+			"□□□◯●◯●×\n".
+			"□□×●●●◯×\n".
+			"□□××××◯□\n".
+			"□□□□□□□□\n".
+			"□□□□□□□□\n";
+		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+		$result = $this->othello_board->move(0, 7)[0];
+		$this->assertSame($result, true);
+		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
+		$this->assertSame($candidate_count, 10);
+		$expected_board_info =
+			"□□□◯◯◯◯◯\n".
+			"□□□×◯●×□\n".
+			"□□××●◯●●\n".
+			"□□×◯●◯●□\n".
+			"□□×●●●◯×\n".
+			"□□□□□□◯×\n".
+			"□□□□□□××\n".
+			"□□□□□□□□\n";
 		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
 	}
 }
