@@ -48,7 +48,7 @@ class OthelloRepl {
 			if ($this->othello->getPlayer() == 1) {
 				[$is_success, $is_game_continue] = $this->othello->random_move3();
 			} else if ($this->othello->getPlayer() == 2) {
-				[$is_success, $is_game_continue] = $this->othello->random_move();
+				[$is_success, $is_game_continue] = $this->othello->random_move2();
 			}
 			$i ++;
 			echo $i."手目\n";
