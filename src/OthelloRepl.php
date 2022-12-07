@@ -41,15 +41,18 @@ class OthelloRepl {
 	}
 
 	public function random_game() {
+		$i = 0;
 		while($this->isGameFinished == false) {
 			$is_success = ""; 
 			$is_game_continue = "";
 			if ($this->othello->getPlayer() == 1) {
-				[$is_success, $is_game_continue] = $this->othello->random_move2();
+				[$is_success, $is_game_continue] = $this->othello->random_move3();
 			} else if ($this->othello->getPlayer() == 2) {
 				[$is_success, $is_game_continue] = $this->othello->random_move();
 			}
-			if ($is_game_continue == false ) {
+			$i ++;
+			echo $i."手目\n";
+			if ($is_game_continue == false || $i > 60) {
 				[$display_board, $candidate_moves] = $this->othello->getCandidateBoard();
 				echo Viewer::view_board($display_board);
 				$this->isGameFinished = true;
@@ -93,7 +96,7 @@ class OthelloRepl {
 					echo "Your move is incorrect...\nmove again\n\n";
 				}
 			} else {
-				[$is_success, $is_game_continue] = $this->othello->random_move2();
+				[$is_success, $is_game_continue] = $this->othello->random_move3();
 				echo "Computer played.\n\n";
 				if ($is_game_continue == false ) {
 					$this->isGameFinished = true;

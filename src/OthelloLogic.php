@@ -17,6 +17,18 @@ class OthelloLogic {
 	private $moves_histories;
 	private $game_history;
 
+	private $virtual_board;
+	private $virtual_player = 1;
+	private $virtual_current_player;
+	private $virtual_original_board1;
+	private $virtual_original_board2;
+	private $virtual_original_board3;
+	private $virtual_original_board4;
+	private $virtual_history1;
+	private $virtual_history2;
+	private $virtual_hirtosy3;
+	private $virtual_history4;
+
 	public function __construct() {
 	}
 
@@ -33,6 +45,7 @@ class OthelloLogic {
 		];
 		$this->player = 1;
 		$this->moves_histories = [[3, 3], [3, 4], [4, 3], [4, 4]];
+		$this->virtual_history1 = [[3, 3], [3, 4], [4, 3], [4, 4]];
 		$this->game_history = [];
 	}
 
@@ -95,26 +108,34 @@ class OthelloLogic {
 		return [$black_count, $white_count, $game_result, $game_diff];
  	}
 
-	public function getCandidateBoard() {
-		$enemy_player = $this->player == 2 ? 1 : 2;
-		[$enemy_player_array, $ally_player_array] = $this->getEnemyAndAllyPlayerArray($enemy_player);
-		$surroundCandidates =  $this->getSurroundCandidates($enemy_player_array);
-		[$surroundCandidates, $defeatedCandidates] = $this->traceSurroundCanMove($surroundCandidates);
-		$this->display_board = $this->board;
+ 	public function getCandidateBoard() {
+ 		$this->display_board = $this->board;
+ 		return $this->getCandidateBoardImpl($this->display_board, $this->moves_histories, $this->player);
+ 	}
+
+ 	public function getCandidateVirtualBoard(&$board, &$history) {
+ 		return $this->getCandidateBoardImpl($board, $history, $this->virtual_player);
+ 	}
+
+	private function getCandidateBoardImpl(&$board, &$history, $player) {
+		$enemy_player = $player == 2 ? 1 : 2;
+		[$enemy_player_array, $ally_player_array] = $this->getEnemyAndAllyPlayerArray($enemy_player, $board);
+		$surroundCandidates =  $this->getSurroundCandidates($enemy_player_array, $history);
+		[$surroundCandidates, $defeatedCandidates] = $this->traceSurroundCanMove($surroundCandidates, $board, $history);
 		foreach ($surroundCandidates as $candidate ) {
-			$this->display_board[$candidate[0]][$candidate[1]] = 3;
+			$board[$candidate[0]][$candidate[1]] = 3;
 		}
-		return [$this->display_board, count($surroundCandidates), $surroundCandidates, $defeatedCandidates];
+		return [$board, count($surroundCandidates), $surroundCandidates, $defeatedCandidates];
 	}
 
-	public function getEnemyAndAllyPlayerArray ($enemy_player) {
+	public function getEnemyAndAllyPlayerArray ($enemy_player, $board) {
 		$enemy_player_array = array();
 		$ally_player_array = array();
 		for ($i = 0; $i < 8; $i++) {
 			for ($j = 0; $j < 8; $j++) {
-				if ($this->board[$i][$j] == $enemy_player) {
+				if ($board[$i][$j] == $enemy_player) {
 					array_push($enemy_player_array, [$i, $j]);
-				} else if ( $this->board[$i][$j] == $this->getPlayer() ) {
+				} else if ( $board[$i][$j] == $this->getPlayer() ) {
 					array_push($ally_player_array, [$i, $j]);
 				}
 			}
@@ -122,18 +143,18 @@ class OthelloLogic {
 		return [$enemy_player_array, $ally_player_array];
 	}
 
-	public function traceSurroundCanMove($surroundCandidates) {
+	public function traceSurroundCanMove($surroundCandidates, $board, $history) {
 		$candidate_array = array();
 		$candidate_defeat_array = array();
 		foreach ($surroundCandidates as $candidate) {
-			$checkBelow = $this->checkBelowWithCount($candidate[0], $candidate[1], $this->player, false);
-			$checkAbove = $this->checkAboveWithCount($candidate[0], $candidate[1], $this->player, false);
-			$checkLeft  = $this->checkLeftWithCount($candidate[0], $candidate[1], $this->player, false);
-			$checkRight = $this->checkRightWithCount($candidate[0], $candidate[1], $this->player, false);
-			$checkAboveLeft = $this->checkAboveLeftWithCount($candidate[0], $candidate[1], $this->player, false);
-			$checkAboveRight = $this->checkAboveRightWithCount($candidate[0], $candidate[1], $this->player, false);
-			$checkBelowLeft = $this->checkBelowLeftWithCount($candidate[0], $candidate[1], $this->player, false);
-			$checkBelowRight = $this->checkBelowRightWithCount($candidate[0], $candidate[1], $this->player, false);
+			$checkBelow = $this->checkBelowWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
+			$checkAbove = $this->checkAboveWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
+			$checkLeft  = $this->checkLeftWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
+			$checkRight = $this->checkRightWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
+			$checkAboveLeft = $this->checkAboveLeftWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
+			$checkAboveRight = $this->checkAboveRightWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
+			$checkBelowLeft = $this->checkBelowLeftWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
+			$checkBelowRight = $this->checkBelowRightWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
 			if ( $checkBelow[0] == false && $checkAbove[0] == false && $checkLeft[0] == false && $checkRight[0] == false && $checkBelowLeft[0] == false &&  $checkBelowRight[0] == false && $checkAboveLeft[0] == false && $checkAboveRight[0] == false ) {
 				continue;
 			} else {
@@ -146,10 +167,10 @@ class OthelloLogic {
 		return [$candidate_array, $candidate_defeat_array];
 	}
 
-	public function getSurroundCandidates ($enemy_player_array) {
+	public function getSurroundCandidates ($enemy_player_array, &$history) {
 		$surroundArray = array();
 		foreach ($enemy_player_array as $enemy_move) {
-			$surroundCandidate = $this->getSurroundMoves($enemy_move);
+			$surroundCandidate = $this->getSurroundMoves($enemy_move, $history);
 			$surroundArray = array_merge($surroundArray, $surroundCandidate);
 		}
 		$surroundResult = array();
@@ -172,7 +193,11 @@ class OthelloLogic {
 		return $surroundResult;
 	}
 
-	public function getSurroundMoves ($move) {
+	public function getSurroundMoves ($move, &$history) {
+		return $this->getSurroundMovesImpl($move, $history);
+	}
+
+	public function getSurroundMovesImpl ($move, &$history) {
 		$aboveMove = [$move[0] - 1, $move[1]];
 		$belowMove = [$move[0] + 1, $move[1]];
 		$rightMove = [$move[0], $move[1] + 1];
@@ -188,13 +213,13 @@ class OthelloLogic {
 				continue;
 			}
 			$hMoveCounter = 0;
-			foreach ( $this->moves_histories as $hMove ) {
+			foreach ( $history as $hMove ) {
 				// move has already appeared.
 				if ( $hMove[0] == $surroundMove[0] && $hMove[1] == $surroundMove[1] ) {
 					break;
 				}
 				$hMoveCounter += 1;
-				if (count($this->moves_histories) == $hMoveCounter) {
+				if (count($history) == $hMoveCounter) {
 					array_push($surroundMovesResult, $surroundMove);
 				}
 			}
@@ -234,7 +259,7 @@ class OthelloLogic {
 		if ($this->player != 1 && $this->player != 2) {
 			throw new Exception("Unknown player;");
 		}
-		$checkMoveHistories = $this->checkMoveHistories($vertical_pos, $horizontal_pos);
+		$checkMoveHistories = $this->checkMoveHistories($vertical_pos, $horizontal_pos, $this->moves_histories);
 
 		if ($checkMoveHistories == true) {
 			return [false, true];
@@ -251,7 +276,7 @@ class OthelloLogic {
 		if ($checkBelow == false && $checkAbove == false && $checkLeft == false && $checkRight == false && $checkBelowLeft == false &&  $checkBelowRight == false && $checkAboveLeft == false && $checkAboveRight == false ) {
 			return [false, true];
 		}
-		$this->commitDefeatedMove([$vertical_pos, $horizontal_pos], $this->player);
+		$this->commitDefeatedMove([$vertical_pos, $horizontal_pos], $this->player, $this->board);
 		array_push($this->moves_histories, [$vertical_pos, $horizontal_pos]);
 		array_push($this->game_history, [$vertical_pos, $horizontal_pos]);
 
@@ -262,6 +287,59 @@ class OthelloLogic {
 		} else {
 			$this->player = $this->player == 1 ? 2 : 1;
 			[$display_board2, $candidate_count2] = $this->getCandidateBoard();
+			if ($candidate_count2 == 0) {
+				return [true, false];
+			} else {
+				return [true, true];
+			}
+		}
+	}
+	public function moveInVirtualBoard($vertical_pos, $horizontal_pos, &$board, &$history) {
+		[$display_board_1, $candidate_count_1] = $this->getCandidateVirtualBoard($board, $history);
+		if ($candidate_count_1 == 0) {
+			$this->player = $this->player == 1 ? 2 : 1;
+			[$display_board_2, $candidate_count_2] = $this->getCandidateVirtualBoard($board, $history);
+			if ($candidate_count_2 == 0) {
+				return [false, false];
+			}
+			$this->player = $this->player == 1 ? 2 : 1;
+		}
+		if (gettype($vertical_pos) != "integer" || gettype($vertical_pos) != "integer") {
+			return [false, true];
+		}
+		if ((int)$vertical_pos < 0 || (int)$vertical_pos > 8 || (int)$horizontal_pos < 0 || (int)$horizontal_pos > 8) {
+			return [false, true];
+		}
+		if ($this->player != 1 && $this->player != 2) {
+			throw new Exception("Unknown player;");
+		}
+		$checkMoveHistories = $this->checkMoveHistories($vertical_pos, $horizontal_pos, $history);
+
+		if ($checkMoveHistories == true) {
+			return [false, true];
+		}
+
+		$checkBelow = $this->checkBelowWithCount($vertical_pos, $horizontal_pos, $this->virtual_player, true, $board, $history)[0];
+		$checkAbove = $this->checkAboveWithCount($vertical_pos, $horizontal_pos, $this->virtual_player, true, $board, $history)[0];
+		$checkLeft  = $this->checkLeftWithCount($vertical_pos, $horizontal_pos, $this->virtual_player, true, $board, $history)[0];
+		$checkRight = $this->checkRightWithCount($vertical_pos, $horizontal_pos, $this->virtual_player, true, $board, $history)[0];
+		$checkBelowLeft = $this->checkBelowLeftWithCount($vertical_pos, $horizontal_pos, $this->virtual_player, true, $board, $history)[0];
+		$checkBelowRight = $this->checkBelowRightWithCount($vertical_pos, $horizontal_pos, $this->virtual_player, true, $board, $history)[0];
+		$checkAboveLeft = $this->checkAboveLeftWithCount($vertical_pos, $horizontal_pos, $this->virtual_player, true, $board, $history)[0];
+		$checkAboveRight = $this->checkAboveRightWithCount($vertical_pos, $horizontal_pos, $this->virtual_player, true, $board, $history)[0];
+		if ($checkBelow == false && $checkAbove == false && $checkLeft == false && $checkRight == false && $checkBelowLeft == false &&  $checkBelowRight == false && $checkAboveLeft == false && $checkAboveRight == false ) {
+			return [false, true];
+		}
+		$this->commitDefeatedMove([$vertical_pos, $horizontal_pos], $this->virtual_player, $board);
+		array_push($history, [$vertical_pos, $horizontal_pos]);
+
+		$this->virtual_player = $this->virtual_player == 1 ? 2 : 1;
+		[$display_board, $candidate_count] = $this->getCandidateVirtualBoard($board, $history);
+		if ($candidate_count != 0) {
+			return [true, true];
+		} else {
+			$this->virtual_player = $this->virtual_player == 1 ? 2 : 1;
+			[$display_board2, $candidate_count2] = $this->getCandidateVirtualBoard($board, $history);
 			if ($candidate_count2 == 0) {
 				return [true, false];
 			} else {
@@ -293,6 +371,122 @@ class OthelloLogic {
 		$selected_move = $move_array[$selected_candidate_id];
 		// echo var_dump($selected_move);
 		$game_result = $this->move($selected_move[0], $selected_move[1]);
+		return $game_result;
+	}
+
+	public function random_move3() {
+		$this->virtual_original_board1 = $this->board;
+		$this->virtual_history1 = $this->moves_histories;
+		$this->virtual_current_player = $this->getPlayer();
+		$this->virtual_player = $this->getPlayer();
+		[$display_board1, $candidate_count1, $candidate_moves1, $candidate_defeat_count1] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1);
+		$pick_corner_array = $this->checkHasCorner($candidate_moves1);
+		if (count($pick_corner_array) == 1) {
+			$game_result = $this->move($pick_corner_array[0][0], $pick_corner_array[0][1]);
+			return $game_result;
+		}
+		$sanitize_near_corner_array = $this->checkHasNearCorner($pick_corner_array);
+		$move_candidate_array = array();
+		$move_candidate_enemy_array = array();
+		$move_candidates_array = array();
+		$first_move = "";
+		$second_move = "";
+		$third_move = "";
+		$forth_move = "";
+		$biggest_first_move = array();
+		$biggest_first_move_count = 0;
+
+		foreach ($sanitize_near_corner_array as $candidate_move1) {
+			$this->virtual_original_board1 = $this->board;
+			$this->virtual_history1 = $this->moves_histories;
+			$this->virtual_player = $this->virtual_current_player;
+			$this->moveInVirtualBoard($candidate_move1[0], $candidate_move1[1], $this->virtual_original_board1, $this->virtual_history1);
+			[$display_board2, $candidate_count2, $candidate_moves2, $candidate_defeat_count2] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1);
+			$first_move = $candidate_move1[0].$candidate_move1[1];
+
+			$smallest_second_move = array();
+			$smallest_second_move_count = 10000;
+			foreach ($candidate_moves2 as $candidate_move2) {
+				$this->virtual_original_board2 = $this->virtual_original_board1;
+				$this->virtual_history2 = $this->virtual_history1;
+				$this->virtual_player = $this->virtual_player == 1 ? 2 : 1;
+				[$display_board3, $candidate_count3, $candidate_moves3, $candidate_defeat_count3] = $this->getCandidateVirtualBoard($this->virtual_original_board2, $this->virtual_history2);
+				$second_move = $candidate_move2[0].$candidate_move2[1];
+				
+				$biggest_third_move = array();
+				$biggest_third_move_count = 0;
+				foreach($candidate_moves3 as $candidate_move3) {
+					$this->virtual_original_board3 = $this->virtual_original_board2;
+					$this->virtual_history3 = $this->virtual_history2;
+					$this->virtual_player = $this->virtual_player == 1 ? 2 : 1;
+					[$display_board4, $candidate_count4, $candidate_moves4, $candidate_defeat_count4] = $this->getCandidateVirtualBoard($this->virtual_original_board3, $this->virtual_history3);
+					$third_move = $candidate_move3[0].$candidate_move3[1];
+					// $move_candidate_enemy_array[$second_move.$third_move] = $candidate_count3;
+					if ($biggest_third_move_count < $candidate_count3) {
+						$biggest_third_move_count = $candidate_count3;
+						$biggest_third_move = array();
+						array_push($biggest_third_move, $first_move.$second_move.$third_move);
+					} else if ($biggest_third_move_count == $candidate_count3) {
+						array_push($biggest_third_move, $first_move.$second_move.$third_move);
+					}
+				}
+				if ($smallest_second_move_count > $biggest_third_move_count) {
+					$smallest_second_move_count = $biggest_third_move_count;
+					$smallest_second_move = array();
+					$smallest_second_move = $biggest_third_move;
+				} else if ($smallest_second_move_count == $biggest_third_move_count) {
+					$smallest_second_move = array_merge($smallest_second_move, $biggest_third_move);
+				}
+			}
+			if (count($smallest_second_move) == 0) {
+				$this->move($sanitize_near_corner_array[0][0], $sanitize_near_corner_array[0][1]);
+				return [true, true];
+			}
+
+			if ($biggest_first_move_count < $smallest_second_move_count) {
+				$biggest_first_move_count = $smallest_second_move_count;
+				$biggest_first_move = array();
+				$biggest_first_move = $smallest_second_move;
+			} else if ( $biggest_first_move_count == $smallest_second_move_count ) {
+				$biggest_first_move = array_merge($biggest_first_move, $smallest_second_move);
+			}
+			/*
+			$enemy_candidate_move2 = array();
+			foreach ($smallest_second_move as $second_move) {
+				array_push($enemy_candidate_move2, [(int)substr($second_move, 2, 1), (int)substr($second_move, 3, 1)]);
+			}
+			*/
+
+			/*
+			foreach ($enemy_candidate_move2 as $candidate_move2) {
+				$this->virtual_original_board2 = $this->virtual_original_board1;
+				$this->virtual_history2 = $this->virtual_history1;
+				$this->virtual_player = $this->virtual_player == 1 ? 2 : 1;
+				[$display_board3, $candidate_count3, $candidate_moves3, $candidate_defeat_count3] = $this->getCandidateVirtualBoard($this->virtual_original_board2, $this->virtual_history2);
+				$second_move = $candidate_move2[0].$candidate_move2[1];
+				foreach($candidate_moves3 as $candidate_move3) {
+					$this->virtual_original_board3 = $this->virtual_original_board2;
+					$this->virtual_history3 = $this->virtual_history2;
+					$this->virtual_player = $this->virtual_player == 1 ? 2 : 1;
+					[$display_board3, $candidate_count3, $candidate_moves3, $candidate_defeat_count3] = $this->getCandidateVirtualBoard($this->virtual_original_board3, $this->virtual_history3);
+					$third_move = $candidate_move3[0].$candidate_move3[1];
+					$move_candidate_array[$first_move.$second_move.$third_move] = $candidate_count3;
+				}
+			}
+			*/
+		}
+		if (count($biggest_first_move) == 0) {
+			$this->move($sanitize_near_corner_array[0][0], $sanitize_near_corner_array[0][1]);
+			return [true, true];
+		}
+		$next_move_candidates = array();
+		foreach ($biggest_first_move as $b_f_move) {
+			array_push($next_move_candidates, [(int)substr($b_f_move, 0, 1), (int)substr($b_f_move, 1, 1)]);
+		}
+		//
+		$next_move_id = rand(0, count($next_move_candidates) - 1);
+		$next_move = $next_move_candidates[$next_move_id];
+		$game_result = $this->move($next_move[0], $next_move[1]);
 		return $game_result;
 	}
 
@@ -349,21 +543,21 @@ class OthelloLogic {
 
 	public function checkBelow($vertical_pos, $horizontal_pos, $player, $is_commit) {
 		//
-		$result = $this->checkBelowImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+		$result = $this->checkBelowImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $this->board, $this->moves_histories);
 		return $result[0];
 	}
-	public function checkBelowWithCount($vertical_pos, $horizontal_pos, $player, $is_commit) {
-		$result = $this->checkBelowImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+	public function checkBelowWithCount($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
+		$result = $this->checkBelowImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $board, $history);
 		return $result;
 	}
-	public function checkBelowImpl($vertical_pos, $horizontal_pos, $player, $is_commit) {
+	private function checkBelowImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
 		if ($vertical_pos >= 6) { return [false, 0]; }
 		$check_vertical_pos = $vertical_pos;
 		$defeated_enemy = array();
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
 			if ($check_vertical_pos == 7) { break; }
-			if ( $this->board[$check_vertical_pos + 1][$horizontal_pos] == $enemy_player ) {
+			if ( $board[$check_vertical_pos + 1][$horizontal_pos] == $enemy_player ) {
 				$check_vertical_pos = $check_vertical_pos + 1;
 				array_push($defeated_enemy, [$check_vertical_pos, $horizontal_pos]);
 				continue;
@@ -372,23 +566,23 @@ class OthelloLogic {
 		}
 		if ($check_vertical_pos == $vertical_pos) { ; return [false, 0]; }
 		if ($check_vertical_pos == 7) { return [false, 0]; }
-		if ($this->board[$check_vertical_pos + 1][$horizontal_pos] != $player) {
+		if ($board[$check_vertical_pos + 1][$horizontal_pos] != $player) {
 			return [false, 0];
 		}
 		if ($is_commit == true) {
-			$this->commitDefeatedMoves($defeated_enemy, $player);
+			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
 		}
 		return [true, count($defeated_enemy)];
 	}
 	public function checkAbove($vertical_pos, $horizontal_pos, $player, $is_commit){
-		$result = $this->checkAboveImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+		$result = $this->checkAboveImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $this->board, $this->moves_histories);
 		return $result[0];
 	}
-	public function checkAboveWithCount($vertical_pos, $horizontal_pos, $player, $is_commit) {
-		$result = $this->checkAboveImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+	public function checkAboveWithCount($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
+		$result = $this->checkAboveImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $board, $history);
 		return $result;
 	}
-	public function checkAboveImpl($vertical_pos, $horizontal_pos, $player, $is_commit) {
+	private function checkAboveImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
 		//
 		if ($vertical_pos <= 1) { return [false, 0]; }
 		$check_vertical_pos = $vertical_pos;
@@ -396,7 +590,7 @@ class OthelloLogic {
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
 			if ($check_vertical_pos == 0) { break; }
-			if ( $this->board[$check_vertical_pos - 1][$horizontal_pos] == $enemy_player ) {
+			if ( $board[$check_vertical_pos - 1][$horizontal_pos] == $enemy_player ) {
 				$check_vertical_pos = $check_vertical_pos - 1;
 				array_push($defeated_enemy, [$check_vertical_pos, $horizontal_pos]);
 				continue;
@@ -405,21 +599,21 @@ class OthelloLogic {
 		}
 		if ($check_vertical_pos == $vertical_pos) { return [false, 0]; }
 		if ($check_vertical_pos == 0) { return [false, 0]; }
-		if ($this->board[$check_vertical_pos - 1][$horizontal_pos] != $player) { return [false, 0]; }
+		if ($board[$check_vertical_pos - 1][$horizontal_pos] != $player) { return [false, 0]; }
 		if ($is_commit == true) {
-			$this->commitDefeatedMoves($defeated_enemy, $player);
+			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
 		}
 		return [true, count($defeated_enemy)];
 	}
 	public function checkLeft($vertical_pos, $horizontal_pos, $player, $is_commit){
-		$result = $this->checkLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+		$result = $this->checkLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $this->board, $this->moves_histories);
 		return $result[0];
 	}
-	public function checkLeftWithCount($vertical_pos, $horizontal_pos, $player, $is_commit) {
-		$result = $this->checkLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+	public function checkLeftWithCount($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
+		$result = $this->checkLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $board, $history);
 		return $result;
 	}
-	public function checkLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit) {
+	private function checkLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
 		//
 		if ($horizontal_pos <= 1) { return [false, 0]; }
 		$check_horizontal_pos = $horizontal_pos;
@@ -427,7 +621,7 @@ class OthelloLogic {
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
 			if ($check_horizontal_pos == 0) { break; }
-			if ($this->board[$vertical_pos][$check_horizontal_pos - 1] == $enemy_player) {
+			if ($board[$vertical_pos][$check_horizontal_pos - 1] == $enemy_player) {
 				$check_horizontal_pos = $check_horizontal_pos - 1;
 				array_push($defeated_enemy, [$vertical_pos, $check_horizontal_pos]);
 				continue;
@@ -436,21 +630,21 @@ class OthelloLogic {
 		}
 		if ($check_horizontal_pos == $horizontal_pos) {return [false, 0]; }
 		if ($check_horizontal_pos == 0) { return [false, 0]; }
-		if ($this->board[$vertical_pos][$check_horizontal_pos - 1] != $player) { return [false, 0]; }
+		if ($board[$vertical_pos][$check_horizontal_pos - 1] != $player) { return [false, 0]; }
 		if ($is_commit == true) {
-			$this->commitDefeatedMoves($defeated_enemy, $player);
+			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
 		}
 		return [true, count($defeated_enemy)];
 	}
 	public function checkRight($vertical_pos, $horizontal_pos, $player, $is_commit) {
-		$result = $this->checkRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+		$result = $this->checkRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $this->board, $this->moves_histories);
 		return $result[0];
 	}
-	public function checkRightWithCount($vertical_pos, $horizontal_pos, $player, $is_commit) {
-		$result = $this->checkRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+	public function checkRightWithCount($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
+		$result = $this->checkRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $board, $history);
 		return $result;
 	}
-	public function checkRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit) {
+	private function checkRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
 		//
 		if ($horizontal_pos >= 6) { return [false, 0]; }
 		$check_horizontal_pos = $horizontal_pos;
@@ -458,7 +652,7 @@ class OthelloLogic {
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
 			if ($check_horizontal_pos == 7) { break; }
-			if ($this->board[$vertical_pos][$check_horizontal_pos + 1] == $enemy_player) {
+			if ($board[$vertical_pos][$check_horizontal_pos + 1] == $enemy_player) {
 				$check_horizontal_pos = $check_horizontal_pos + 1;
 				array_push($defeated_enemy, [$vertical_pos, $check_horizontal_pos]);
 				continue;
@@ -467,21 +661,21 @@ class OthelloLogic {
 		}
 		if ($check_horizontal_pos == $horizontal_pos) { return [false, 0]; }
 		if ($check_horizontal_pos == 7) { return [false, 0]; }
-		if ($this->board[$vertical_pos][$check_horizontal_pos + 1] != $player) { return [false, 0]; }
+		if ($board[$vertical_pos][$check_horizontal_pos + 1] != $player) { return [false, 0]; }
 		if ($is_commit == true) {
-			$this->commitDefeatedMoves($defeated_enemy, $player);
+			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
 		}
 		return [true, count($defeated_enemy)];
 	}
 	public function checkBelowLeft($vertical_pos, $horizontal_pos, $player, $is_commit) {
-		$result = $this->checkBelowLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+		$result = $this->checkBelowLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $this->board, $this->moves_histories);
 		return $result[0];
 	}
-	public function checkBelowLeftWithCount($vertical_pos, $horizontal_pos, $player, $is_commit) {
-		$result = $this->checkBelowLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+	public function checkBelowLeftWithCount($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
+		$result = $this->checkBelowLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $board, $history);
 		return $result;
 	}
-	public function checkBelowLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit) {
+	private function checkBelowLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
 		//
 		if ($vertical_pos >= 6 || $horizontal_pos <= 1) { return [false, 0]; }
 		$check_vertical_pos = $vertical_pos;
@@ -490,7 +684,7 @@ class OthelloLogic {
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
 			if ($check_horizontal_pos == 0 || $check_vertical_pos == 7) { break; }
-			if ($this->board[$check_vertical_pos+1][$check_horizontal_pos-1] == $enemy_player) {
+			if ($board[$check_vertical_pos+1][$check_horizontal_pos-1] == $enemy_player) {
 				$check_vertical_pos = $check_vertical_pos + 1 ;
 				$check_horizontal_pos = $check_horizontal_pos - 1 ;
 				array_push($defeated_enemy, [$check_vertical_pos, $check_horizontal_pos]);
@@ -500,21 +694,21 @@ class OthelloLogic {
 		}
 		if ( $check_vertical_pos == $vertical_pos ) { return [false, 0]; }
 		if ($check_vertical_pos == 7 || $check_horizontal_pos == 0 ) { return [false, 0]; }
-		if ($this->board[$check_vertical_pos+1][$check_horizontal_pos-1] != $player) { return [false, 0]; }
+		if ($board[$check_vertical_pos+1][$check_horizontal_pos-1] != $player) { return [false, 0]; }
 		if ($is_commit == true) {
-			$this->commitDefeatedMoves($defeated_enemy, $player);
+			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
 		}
 		return [true, count($defeated_enemy)];
 	}
 	public function checkBelowRight($vertical_pos, $horizontal_pos, $player, $is_commit) {
-		$result = $this->checkBelowRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+		$result = $this->checkBelowRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $this->board, $this->moves_histories);
 		return $result[0];
 	}
-	public function checkBelowRightWithCount($vertical_pos, $horizontal_pos, $player, $is_commit) {
-		$result = $this->checkBelowRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+	public function checkBelowRightWithCount($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
+		$result = $this->checkBelowRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $board, $history);
 		return $result;
 	}
-	public function checkBelowRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit) {
+	private function checkBelowRightImpl($vertical_pos, $horizontal_pos, $player, &$is_commit, &$board, &$history) {
 		//
 		if ($vertical_pos >= 6 || $horizontal_pos >= 6) { return [false, 0]; }
 		$check_vertical_pos = $vertical_pos;
@@ -523,7 +717,7 @@ class OthelloLogic {
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
 			if ($check_horizontal_pos == 7 || $check_vertical_pos == 7) { break; }
-			if ($this->board[$check_vertical_pos+1][$check_horizontal_pos+1] == $enemy_player) {
+			if ($board[$check_vertical_pos+1][$check_horizontal_pos+1] == $enemy_player) {
 				$check_vertical_pos = $check_vertical_pos + 1;
 				$check_horizontal_pos = $check_horizontal_pos + 1;
 				array_push($defeated_enemy, [$check_vertical_pos, $check_horizontal_pos]);
@@ -533,21 +727,21 @@ class OthelloLogic {
 		}
 		if ( $check_vertical_pos == $vertical_pos ) { return [false, 0]; }
 		if ($check_vertical_pos == 7 || $check_horizontal_pos == 7 ) { return [false, 0]; }
-		if ($this->board[$check_vertical_pos+1][$check_horizontal_pos+1] != $player) { return [false, 0]; }
+		if ($board[$check_vertical_pos+1][$check_horizontal_pos+1] != $player) { return [false, 0]; }
 		if ($is_commit == true) {
-			$this->commitDefeatedMoves($defeated_enemy, $player);
+			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
 		}
 		return [true, count($defeated_enemy)];
 	}
 	public function checkAboveLeft($vertical_pos, $horizontal_pos, $player, $is_commit) {
-		$result = $this->checkAboveLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+		$result = $this->checkAboveLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $this->board, $this->moves_histories);
 		return $result[0];
 	}
-	public function checkAboveLeftWithCount($vertical_pos, $horizontal_pos, $player, $is_commit) {
-		$result = $this->checkAboveLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+	public function checkAboveLeftWithCount($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
+		$result = $this->checkAboveLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $board, $history);
 		return $result;
 	}
-	public function checkAboveLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit) {
+	private function checkAboveLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
 		//
 		if ($vertical_pos <= 1 || $horizontal_pos <= 1) { return [false, 0]; }
 		$check_vertical_pos = $vertical_pos;
@@ -556,7 +750,7 @@ class OthelloLogic {
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
 			if ($check_horizontal_pos == 0 || $check_vertical_pos == 0) { break; }
-			if ($this->board[$check_vertical_pos-1][$check_horizontal_pos-1] == $enemy_player) {
+			if ($board[$check_vertical_pos-1][$check_horizontal_pos-1] == $enemy_player) {
 				$check_vertical_pos = $check_vertical_pos - 1;
 				$check_horizontal_pos = $check_horizontal_pos - 1;
 				array_push($defeated_enemy, [$check_vertical_pos, $check_horizontal_pos]);
@@ -566,21 +760,21 @@ class OthelloLogic {
 		}
 		if ( $check_vertical_pos == $vertical_pos ) { return [false, 0]; }
 		if ($check_vertical_pos == 0 || $check_horizontal_pos == 0) { return [false, 0]; }
-		if ($this->board[$check_vertical_pos-1][$check_horizontal_pos-1] != $player) { return [false, 0]; }
+		if ($board[$check_vertical_pos-1][$check_horizontal_pos-1] != $player) { return [false, 0]; }
 		if ($is_commit == true) {
-			$this->commitDefeatedMoves($defeated_enemy, $player);
+			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
 		}
 		return [true, count($defeated_enemy)];
 	}
 	public function checkAboveRight($vertical_pos, $horizontal_pos, $player, $is_commit) {
-		$result = $this->checkAboveRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+		$result = $this->checkAboveRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $this->board, $this->moves_histories);
 		return $result[0];
 	}
-	public function checkAboveRightWithCount($vertical_pos, $horizontal_pos, $player, $is_commit) {
-		$result = $this->checkAboveRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit);
+	public function checkAboveRightWithCount($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
+		$result = $this->checkAboveRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $board, $history);
 		return $result;
 	}
-	public function checkAboveRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit) {
+	private function checkAboveRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
 		//
 		if ($vertical_pos <= 1 || $horizontal_pos >= 6) { return [false, 0]; }
 		$check_vertical_pos = $vertical_pos;
@@ -589,7 +783,7 @@ class OthelloLogic {
 		$enemy_player = $player == 1 ? 2 : 1;
 		while (true) {
 			if ($check_horizontal_pos == 7 || $check_vertical_pos == 0) { break; }
-			if ($this->board[$check_vertical_pos-1][$check_horizontal_pos+1] == $enemy_player) {
+			if ($board[$check_vertical_pos-1][$check_horizontal_pos+1] == $enemy_player) {
 				$check_vertical_pos = $check_vertical_pos - 1;
 				$check_horizontal_pos = $check_horizontal_pos + 1;
 				array_push($defeated_enemy, [$check_vertical_pos, $check_horizontal_pos]);
@@ -599,27 +793,27 @@ class OthelloLogic {
 		}
 		if ( $check_vertical_pos == $vertical_pos ) { return [false, 0]; }
 		if ($check_vertical_pos == 0 || $check_horizontal_pos == 7) { return [false, 0]; }
-		if ($this->board[$check_vertical_pos-1][$check_horizontal_pos+1] != $player) { return [false, 0]; }
+		if ($board[$check_vertical_pos-1][$check_horizontal_pos+1] != $player) { return [false, 0]; }
 		if ($is_commit == true) {
-			$this->commitDefeatedMoves($defeated_enemy, $player);
+			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
 		}
 		return [true, count($defeated_enemy)];
 	}
-	public function commitDefeatedMoves($defeated_moves, $player) {
+	public function commitDefeatedMoves($defeated_moves, $player, &$board, $history) {
 		foreach ($defeated_moves as $d_move) {
 			// only permit stones that has already appeared.
-			foreach ($this->moves_histories as $h_move) {
+			foreach ($history as $h_move) {
 				if ($h_move[0] == $d_move[0] && $h_move[1] == $d_move[1]) {
-					$this->board[$d_move[0]][$d_move[1]] = $player;
+					$board[$d_move[0]][$d_move[1]] = $player;
 				}
 			}
 		}
 	}
-	public function commitDefeatedMove($defeated_move, $player) {
-		$this->board[$defeated_move[0]][$defeated_move[1]] = $player;
+	public function commitDefeatedMove($defeated_move, $player, &$board) {
+		$board[$defeated_move[0]][$defeated_move[1]] = $player;
 	}
-	public function checkMoveHistories($vertical_pos, $horizontal_pos) {
-		foreach ($this->moves_histories as $move_h) {
+	public function checkMoveHistories($vertical_pos, $horizontal_pos, $history) {
+		foreach ($history as $move_h) {
 			if ($move_h[0] == $vertical_pos && $move_h[1] == $horizontal_pos) {
 				return true;
 			}
