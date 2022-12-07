@@ -35,10 +35,14 @@ class OthelloLogic {
 	private $virtual_original_board2;
 	private $virtual_original_board3;
 	private $virtual_original_board4;
+	private $virtual_original_board5;
+	private $virtual_original_board6;
 	private $virtual_history1;
 	private $virtual_history2;
 	private $virtual_hirtosy3;
 	private $virtual_history4;
+	private $virtual_history5;
+	private $virtual_history6;
 
 	public function __construct() {
 		$this->player = Player::Black->value;
@@ -419,7 +423,7 @@ class OthelloLogic {
 			$first_move = $candidate_move1[0].$candidate_move1[1];
 
 			$smallest_second_move = array();
-			$smallest_second_move_count = 10000;
+			$smallest_second_move_count = 100;
 			foreach ($candidate_moves2 as $candidate_move2) {
 				$this->virtual_original_board2 = $this->virtual_original_board1;
 				$this->virtual_history2 = $this->virtual_history1;
@@ -436,12 +440,52 @@ class OthelloLogic {
 					[$display_board4, $candidate_count4, $candidate_moves4, $candidate_defeat_count4] = $this->getCandidateVirtualBoard($this->virtual_original_board3, $this->virtual_history3);
 					$third_move = $candidate_move3[0].$candidate_move3[1];
 					$total_search += 1;
-					// $move_candidate_enemy_array[$second_move.$third_move] = $candidate_count3;
-					if ($biggest_third_move_count < $candidate_count3) {
-						$biggest_third_move_count = $candidate_count3;
+
+					/*
+					// forth ...
+					$smallest_forth_move = array();
+					$smallest_forth_move_count = 100;
+					foreach ($candidate_moves4 as $candidate_move4) {
+						$this->virtual_original_board4 = $this->virtual_original_board3;
+						$this->virtual_history4 = $this->virtual_history3;
+						$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
+						[$display_board5, $candidate_count5, $candidate_moves5, $candidate_defeat_count5] = $this->getCandidateVirtualBoard($this->virtual_original_board4, $this->virtual_history4);
+						$forth_move = $candidate_move4[0].$candidate_move4[1];
+						// fifth ...
+						$biggest_fifth_move = array();
+						$biggest_fifth_move_count = 0;
+						foreach ($candidate_moves5 as $candidate_move5) {
+							$this->virtual_original_board5 = $this->virtual_original_board4;
+							$this->virtual_history5 = $this->virtual_history4;
+							$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
+							[$display_board6, $candidate_count6, $candidate_moves6, $candidate_defeat_count6] = $this->getCandidateVirtualBoard($this->virtual_original_board5, $this->virtual_history5);
+							$fifth_move = $candidate_move5[0].$candidate_move5[1];
+							$total_search += 1;
+							if ($biggest_fifth_move_count < $candidate_count6) {
+								$biggest_fifth_move_count = $candidate_count6;
+								$biggest_fifth_move = array();
+								array_push($biggest_fifth_move, $first_move.$second_move.$third_move.$forth_move.$fifth_move);
+							} else if ($biggest_fifth_move_count == $candidate_count6) {
+								array_push($biggest_fifth_move, $first_move.$second_move.$third_move.$forth_move.$fifth_move);
+							}
+						}
+						if ($smallest_forth_move_count > $biggest_fifth_move_count) {
+							$smallest_forth_move_count = $biggest_fifth_move_count;
+							$smallest_forth_move = array();
+							$smallest_forth_move = $biggest_fifth_move;
+						} else if ($smallest_forth_move_count == $biggest_fifth_move_count) {
+							$smallest_forth_move = array_merge($smallest_forth_move, $biggest_fifth_move);
+						}
+					}
+					*/
+
+					// if you want to down to 4th level, change smallest_forth_move_count to $candidate_count
+					// 
+					if ($biggest_third_move_count < $candidate_count4) {
+						$biggest_third_move_count = $candidate_count4;
 						$biggest_third_move = array();
 						array_push($biggest_third_move, $first_move.$second_move.$third_move);
-					} else if ($biggest_third_move_count == $candidate_count3) {
+					} else if ($biggest_third_move_count == $candidate_count4) {
 						array_push($biggest_third_move, $first_move.$second_move.$third_move);
 					}
 				}
