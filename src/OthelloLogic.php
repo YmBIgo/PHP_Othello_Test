@@ -76,7 +76,7 @@ class OthelloLogic {
 		foreach ($this->board as $board_row) {
 			foreach ($board_row as $move) {
 				if ($move == Stone::Black->value) {
-					$blank_count += 1;
+					$black_count += 1;
 				} else if ($move == Stone::White->value) {
 					$white_count += 1;
 				}
@@ -428,7 +428,7 @@ class OthelloLogic {
 		$second_move = "";
 		$third_move = "";
 		$biggest_first_move = array();
-		$biggest_first_move_count = 0;
+		$biggest_first_move_count = 100;
 
 		foreach ($sanitize_near_corner_array as $candidate_move1) {
 			$this->virtual_player = $this->virtual_current_player;
@@ -440,7 +440,7 @@ class OthelloLogic {
 			$first_move = $candidate_move1[0].$candidate_move1[1];
 
 			$smallest_second_move = array();
-			$smallest_second_move_count = 100;
+			$smallest_second_move_count = 0;
 			foreach ($candidate_moves2 as $candidate_move2) {
 				$this->virtual_player = $this->virtual_current_player == Player::Black->value ? Player::White->value : Player::Black->value;
 				$this->virtual_original_board2 = unserialize(serialize($this->virtual_original_board1));
@@ -451,7 +451,7 @@ class OthelloLogic {
 				$second_move = $candidate_move2[0].$candidate_move2[1];
 
 				$biggest_third_move = array();
-				$biggest_third_move_count = 0;
+				$biggest_third_move_count = 100;
 				foreach($candidate_moves3 as $candidate_move3) {
 					$this->virtual_player = $this->virtual_current_player;
 					$this->virtual_original_board3 = unserialize(serialize($this->virtual_original_board2));
@@ -502,7 +502,7 @@ class OthelloLogic {
 
 					// if you want to down to 4th level, change smallest_forth_move_count to $candidate_count
 					// 
-					if ($biggest_third_move_count < $candidate_count4) {
+					if ($biggest_third_move_count > $candidate_count4) {
 						$biggest_third_move_count = $candidate_count4;
 						$biggest_third_move = array();
 						array_push($biggest_third_move, $first_move.$second_move.$third_move);
@@ -511,7 +511,7 @@ class OthelloLogic {
 					}
 				}
 				// echo "biggest third ".$biggest_third_move_count."\n";
-				if ($smallest_second_move_count > $biggest_third_move_count) {
+				if ($smallest_second_move_count < $biggest_third_move_count) {
 					$smallest_second_move_count = $biggest_third_move_count;
 					$smallest_second_move = array();
 					$smallest_second_move = $biggest_third_move;
@@ -521,7 +521,7 @@ class OthelloLogic {
 			}
 
 			// echo "smallest second ".$smallest_second_move_count."\n";
-			if ($biggest_first_move_count < $smallest_second_move_count) {
+			if ($biggest_first_move_count > $smallest_second_move_count) {
 				$biggest_first_move_count = $smallest_second_move_count;
 				$biggest_first_move = array();
 				$biggest_first_move = $smallest_second_move;

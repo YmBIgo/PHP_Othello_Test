@@ -136,6 +136,7 @@ class OthelloRepl {
 					}
 					echo Viewer::view_board($display_board);
 					$this->isGameFinished = true;
+					$this->othello->EchoGameResult();
 				}
 			}
 		}
