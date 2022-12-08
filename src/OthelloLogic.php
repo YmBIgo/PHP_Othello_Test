@@ -35,8 +35,7 @@ class OthelloLogic {
 	private $virtual_original_board2;
 	private $virtual_original_board3;
 	private $virtual_original_board4;
-	private $virtual_original_board5;
-	private $virtual_original_board6;
+	private $virtual_original_display_board;
 	private $virtual_history1;
 	private $virtual_history2;
 	private $virtual_hirtosy3;
@@ -72,7 +71,7 @@ class OthelloLogic {
 	}
 
 	public function EchoGameResult() {
-		$blank_count = 0;
+		$black_count = 0;
 		$white_count = 0;
 		foreach ($this->board as $board_row) {
 			foreach ($board_row as $move) {
@@ -84,7 +83,7 @@ class OthelloLogic {
 			}
 		}
 		
-		echo "\n\n Blank = ".$blank_count;
+		echo "\n\n Blackk = ".$black_count;
 		echo "\n White = ".$white_count;
 		echo "\n\n";
 
@@ -130,15 +129,16 @@ class OthelloLogic {
  		return $this->getCandidateBoardImpl($this->display_board, $this->moves_histories, $this->player);
  	}
 
- 	public function getCandidateVirtualBoard(&$board, &$history) {
- 		return $this->getCandidateBoardImpl($board, $history, $this->virtual_player);
+ 	public function getCandidateVirtualBoard($board, &$history, $player) {
+ 		$this->virtual_original_display_board = $board;
+ 		return $this->getCandidateBoardImpl($this->virtual_original_display_board, $history, $player);
  	}
 
 	private function getCandidateBoardImpl(&$board, &$history, $player) {
 		$enemy_player = $player == Player::Black->value ? Player::White->value : Player::Black->value;
 		[$enemy_player_array, $ally_player_array] = $this->getEnemyAndAllyPlayerArray($enemy_player, $board);
 		$surroundCandidates =  $this->getSurroundCandidates($enemy_player_array, $history);
-		[$surroundCandidates, $defeatedCandidates] = $this->traceSurroundCanMove($surroundCandidates, $board, $history);
+		[$surroundCandidates, $defeatedCandidates] = $this->traceSurroundCanMove($surroundCandidates, $board, $history, $player);
 		foreach ($surroundCandidates as $candidate ) {
 			$board[$candidate[0]][$candidate[1]] = Stone::Candidate->value;
 		}
@@ -160,18 +160,18 @@ class OthelloLogic {
 		return [$enemy_player_array, $ally_player_array];
 	}
 
-	public function traceSurroundCanMove($surroundCandidates, $board, $history) {
+	public function traceSurroundCanMove($surroundCandidates, $board, $history, $player) {
 		$candidate_array = array();
 		$candidate_defeat_array = array();
 		foreach ($surroundCandidates as $candidate) {
-			$checkBelow = $this->checkBelowWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
-			$checkAbove = $this->checkAboveWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
-			$checkLeft  = $this->checkLeftWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
-			$checkRight = $this->checkRightWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
-			$checkAboveLeft = $this->checkAboveLeftWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
-			$checkAboveRight = $this->checkAboveRightWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
-			$checkBelowLeft = $this->checkBelowLeftWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
-			$checkBelowRight = $this->checkBelowRightWithCount($candidate[0], $candidate[1], $this->player, false, $board, $history);
+			$checkBelow = $this->checkBelowWithCount($candidate[0], $candidate[1], $player, false, $board, $history);
+			$checkAbove = $this->checkAboveWithCount($candidate[0], $candidate[1], $player, false, $board, $history);
+			$checkLeft  = $this->checkLeftWithCount($candidate[0], $candidate[1], $player, false, $board, $history);
+			$checkRight = $this->checkRightWithCount($candidate[0], $candidate[1], $player, false, $board, $history);
+			$checkAboveLeft = $this->checkAboveLeftWithCount($candidate[0], $candidate[1], $player, false, $board, $history);
+			$checkAboveRight = $this->checkAboveRightWithCount($candidate[0], $candidate[1], $player, false, $board, $history);
+			$checkBelowLeft = $this->checkBelowLeftWithCount($candidate[0], $candidate[1], $player, false, $board, $history);
+			$checkBelowRight = $this->checkBelowRightWithCount($candidate[0], $candidate[1], $player, false, $board, $history);
 			if ( $checkBelow[0] == false && $checkAbove[0] == false && $checkLeft[0] == false && $checkRight[0] == false && $checkBelowLeft[0] == false &&  $checkBelowRight[0] == false && $checkAboveLeft[0] == false && $checkAboveRight[0] == false ) {
 				continue;
 			} else {
@@ -248,6 +248,10 @@ class OthelloLogic {
 		return $this->player;
 	}
 
+	public function getVirtualPlayer() {
+		return $this->virtual_player;
+	}
+
 	public function getGameHistory() {
 		return $this->game_history;
 	}
@@ -260,12 +264,13 @@ class OthelloLogic {
 	public function move($vertical_pos, $horizontal_pos) {
 		[$display_board_1, $candidate_count_1] = $this->getCandidateBoard();
 		if ($candidate_count_1 == 0) {
-			$this->player = $this->player == 1 ? 2 : 1;
+			$this->player = $this->player == Player::Black->value ? Player::White->value : Player::Black->value;
+			$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
 			[$display_board_2, $candidate_count_2] = $this->getCandidateBoard();
 			if ($candidate_count_2 == 0) {
 				return [false, false];
 			}
-			$this->player = $this->player == 1 ? 2 : 1;
+			// $this->player = $this->player == Player::Black->value ? Player::White->value : Player::Black->value;
 		}
 		if (gettype($vertical_pos) != "integer" || gettype($vertical_pos) != "integer") {
 			return [false, true];
@@ -298,11 +303,13 @@ class OthelloLogic {
 		array_push($this->game_history, [$vertical_pos, $horizontal_pos]);
 
 		$this->player = $this->player == Player::Black->value ? Player::White->value : Player::Black->value;
+		$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
 		[$display_board, $candidate_count] = $this->getCandidateBoard();
 		if ($candidate_count != 0) {
 			return [true, true];
 		} else {
 			$this->player = $this->player == Player::Black->value ? Player::White->value : Player::Black->value;
+			$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
 			[$display_board2, $candidate_count2] = $this->getCandidateBoard();
 			if ($candidate_count2 == 0) {
 				return [true, false];
@@ -312,14 +319,14 @@ class OthelloLogic {
 		}
 	}
 	public function moveInVirtualBoard($vertical_pos, $horizontal_pos, &$board, &$history) {
-		[$display_board_1, $candidate_count_1] = $this->getCandidateVirtualBoard($board, $history);
+		[$display_board_1, $candidate_count_1] = $this->getCandidateVirtualBoard($board, $history, $this->virtual_player);
 		if ($candidate_count_1 == 0) {
-			$this->player = $this->player == Player::Black->value ? Player::White->value : Player::Black->value;
-			[$display_board_2, $candidate_count_2] = $this->getCandidateVirtualBoard($board, $history);
+			$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
+			[$display_board_2, $candidate_count_2] = $this->getCandidateVirtualBoard($board, $history, $this->virtual_player);
 			if ($candidate_count_2 == 0) {
 				return [false, false];
 			}
-			$this->player = $this->player == Player::Black->value ? Player::White->value : Player::Black->value;
+			// $this->player = $this->player == Player::Black->value ? Player::White->value : Player::Black->value;
 		}
 		if (gettype($vertical_pos) != "integer" || gettype($vertical_pos) != "integer") {
 			return [false, true];
@@ -351,12 +358,12 @@ class OthelloLogic {
 		array_push($history, [$vertical_pos, $horizontal_pos]);
 
 		$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
-		[$display_board, $candidate_count] = $this->getCandidateVirtualBoard($board, $history);
-		if ($candidate_count != 0) {
+		[$display_board1, $candidate_count1] = $this->getCandidateVirtualBoard($board, $history, $this->virtual_player);
+		if ($candidate_count1 != 0) {
 			return [true, true];
 		} else {
 			$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
-			[$display_board2, $candidate_count2] = $this->getCandidateVirtualBoard($board, $history);
+			[$display_board2, $candidate_count2] = $this->getCandidateVirtualBoard($board, $history, $this->virtual_player);
 			if ($candidate_count2 == 0) {
 				return [true, false];
 			} else {
@@ -377,6 +384,11 @@ class OthelloLogic {
 		[$display_board, $candidate_count, $candidate_moves, $candidate_defeat_count] = $this->getCandidateBoard();
 		$pick_corner_array = $this->checkHasCorner($candidate_moves);
 		$sanitize_near_corner_array = $this->checkHasNearCorner($pick_corner_array);
+		if (count($sanitize_near_corner_array) == 0) {
+			$this->player = Player::Black->value ? Player::White->value : Player::Black->value;
+			$this->virtual_player = Player::Black->value ? Player::White->value : Player::Black->value;
+			return [true, false];
+		}
 		$game_history_len = count($this->game_history);
 		$move_array = array();
 		if ($game_history_len < 41) {
@@ -386,23 +398,28 @@ class OthelloLogic {
 		}
 		$selected_candidate_id = rand(0, count($move_array) - 1);
 		$selected_move = $move_array[$selected_candidate_id];
-		// echo var_dump($selected_move);
 		$game_result = $this->move($selected_move[0], $selected_move[1]);
 		return $game_result;
 	}
 
 	public function random_move3() {
 		$this->virtual_original_board1 = $this->board;
+		$this->virtual_original_display_board1 = $this->virtual_original_board1;
 		$this->virtual_history1 = $this->moves_histories;
 		$this->virtual_current_player = $this->getPlayer();
-		$this->virtual_player = $this->getPlayer();
-		[$display_board1, $candidate_count1, $candidate_moves1, $candidate_defeat_count1] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1);
+		$this->virtual_player = unserialize(serialize($this->getPlayer()));
+		[$display_board1, $candidate_count1, $candidate_moves1, $candidate_defeat_count1] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1, $this->virtual_player);
 		$pick_corner_array = $this->checkHasCorner($candidate_moves1);
 		if (count($pick_corner_array) == 1) {
 			$game_result = $this->move($pick_corner_array[0][0], $pick_corner_array[0][1]);
 			return $game_result;
 		}
 		$sanitize_near_corner_array = $this->checkHasNearCorner($pick_corner_array);
+		if (count($sanitize_near_corner_array) == 0) {
+			$this->player = Player::Black->value ? Player::White->value : Player::Black->value;
+			$this->virtual_player = Player::Black->value ? Player::White->value : Player::Black->value;
+			return [true, false];
+		}
 		$move_candidate_array = array();
 		$move_candidate_enemy_array = array();
 		$move_candidates_array = array();
@@ -410,34 +427,38 @@ class OthelloLogic {
 		$first_move = "";
 		$second_move = "";
 		$third_move = "";
-		$forth_move = "";
 		$biggest_first_move = array();
 		$biggest_first_move_count = 0;
 
 		foreach ($sanitize_near_corner_array as $candidate_move1) {
-			$this->virtual_original_board1 = $this->board;
-			$this->virtual_history1 = $this->moves_histories;
 			$this->virtual_player = $this->virtual_current_player;
+			$this->virtual_original_board1 = unserialize(serialize($this->board));
+			$this->virtual_original_display_board1 = $this->virtual_original_board1;
+			$this->virtual_history1 = $this->moves_histories;
 			$this->moveInVirtualBoard($candidate_move1[0], $candidate_move1[1], $this->virtual_original_board1, $this->virtual_history1);
-			[$display_board2, $candidate_count2, $candidate_moves2, $candidate_defeat_count2] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1);
+			[$display_board2, $candidate_count2, $candidate_moves2, $candidate_defeat_count2] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1, $this->virtual_player);
 			$first_move = $candidate_move1[0].$candidate_move1[1];
 
 			$smallest_second_move = array();
 			$smallest_second_move_count = 100;
 			foreach ($candidate_moves2 as $candidate_move2) {
-				$this->virtual_original_board2 = $this->virtual_original_board1;
+				$this->virtual_player = $this->virtual_current_player == Player::Black->value ? Player::White->value : Player::Black->value;
+				$this->virtual_original_board2 = unserialize(serialize($this->virtual_original_board1));
+				$this->virtual_original_display_board2 = $this->virtual_original_board2;
 				$this->virtual_history2 = $this->virtual_history1;
-				$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
-				[$display_board3, $candidate_count3, $candidate_moves3, $candidate_defeat_count3] = $this->getCandidateVirtualBoard($this->virtual_original_board2, $this->virtual_history2);
+				$this->moveInVirtualBoard($candidate_move2[0], $candidate_move2[1], $this->virtual_original_board2, $this->virtual_history2);
+				[$display_board3, $candidate_count3, $candidate_moves3, $candidate_defeat_count3] = $this->getCandidateVirtualBoard($this->virtual_original_board2, $this->virtual_history2, $this->virtual_player);
 				$second_move = $candidate_move2[0].$candidate_move2[1];
 
 				$biggest_third_move = array();
 				$biggest_third_move_count = 0;
 				foreach($candidate_moves3 as $candidate_move3) {
-					$this->virtual_original_board3 = $this->virtual_original_board2;
-					$this->virtual_history3 = $this->virtual_history2;
-					$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
-					[$display_board4, $candidate_count4, $candidate_moves4, $candidate_defeat_count4] = $this->getCandidateVirtualBoard($this->virtual_original_board3, $this->virtual_history3);
+					$this->virtual_player = $this->virtual_current_player;
+					$this->virtual_original_board3 = unserialize(serialize($this->virtual_original_board2));
+					$this->virtual_original_display_board3 = $this->virtual_original_board3;
+					$this->virtual_history3 = unserialize(serialize($this->virtual_history2));
+					$this->moveInVirtualBoard($candidate_move3[0], $candidate_move3[1], $this->virtual_original_board3, $this->virtual_history3);
+					[$display_board4, $candidate_count4, $candidate_moves4, $candidate_defeat_count4] = $this->getCandidateVirtualBoard($this->virtual_original_board3, $this->virtual_history3, $this->virtual_player);
 					$third_move = $candidate_move3[0].$candidate_move3[1];
 					$total_search += 1;
 
@@ -489,6 +510,7 @@ class OthelloLogic {
 						array_push($biggest_third_move, $first_move.$second_move.$third_move);
 					}
 				}
+				// echo "biggest third ".$biggest_third_move_count."\n";
 				if ($smallest_second_move_count > $biggest_third_move_count) {
 					$smallest_second_move_count = $biggest_third_move_count;
 					$smallest_second_move = array();
@@ -497,11 +519,8 @@ class OthelloLogic {
 					$smallest_second_move = array_merge($smallest_second_move, $biggest_third_move);
 				}
 			}
-			if (count($smallest_second_move) == 0) {
-				$this->move($sanitize_near_corner_array[0][0], $sanitize_near_corner_array[0][1]);
-				return [true, true];
-			}
 
+			// echo "smallest second ".$smallest_second_move_count."\n";
 			if ($biggest_first_move_count < $smallest_second_move_count) {
 				$biggest_first_move_count = $smallest_second_move_count;
 				$biggest_first_move = array();
@@ -510,6 +529,8 @@ class OthelloLogic {
 				$biggest_first_move = array_merge($biggest_first_move, $smallest_second_move);
 			}
 		}
+		// echo var_dump($biggest_first_move);
+		// echo $biggest_first_move_count."\n";
 		if (count($biggest_first_move) == 0) {
 			$this->move($sanitize_near_corner_array[0][0], $sanitize_near_corner_array[0][1]);
 			return [true, true];
@@ -524,6 +545,20 @@ class OthelloLogic {
 		$next_move = $next_move_candidates[$next_move_id];
 		$game_result = $this->move($next_move[0], $next_move[1]);
 		return $game_result;
+	}
+
+	public function random_move3_practice() {
+		$this->virtual_original_board1 = $this->board;
+		$this->virtual_original_display_board1 = $this->virtual_original_board1;
+		$this->virtual_history1 = $this->moves_histories;
+		$this->virtual_current_player = $this->getPlayer();
+		$this->virtual_player = unserialize(serialize($this->getPlayer()));
+		[$display_board1, $candidate_count1, $candidate_moves1, $candidate_defeat_count1] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1, $this->virtual_player);
+		$this->moveInVirtualBoard($candidate_moves1[0][0], $candidate_moves1[0][1], $this->virtual_original_board1, $this->virtual_history1);
+		echo Viewer::view_board($this->virtual_original_board1);
+
+		[$display_board2, $candidate_count2, $candidate_moves2, $candidate_defeat_count2] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1, $this->virtual_player);
+		echo Viewer::view_board($display_board2);
 	}
 
 	public function checkHasCorner($candidate_moves) {

@@ -108,8 +108,45 @@ class OthelloRepl {
 		$this->othello->EchoGameResult();
 	}
 
+	public function autoPlay100() {
+		$black_wins = 0;
+		$white_wins = 0;
+		$draw = 0;
+		for ($i = 0; $i < 10; $i++) {
+			$this->othello->initBoard();
+			$this->isGameFinished = false;
+			echo "---------勝負".$i."---------\n";
+			while($this->isGameFinished == false) {
+				$is_success = ""; 
+				$is_game_continue = "";
+				if ($this->othello->getPlayer() == 1) {
+					[$is_success, $is_game_continue] = $this->othello->random_move3();
+				} else if ($this->othello->getPlayer() == 2) {
+					[$is_success, $is_game_continue] = $this->othello->random_move2();
+				}
+				if ($is_game_continue == false) {
+					[$display_board, $candidate_moves] = $this->othello->getCandidateBoard();
+					$game_result = $this->othello->getGameResult();
+					if ( $game_result[2] == 1 ) {
+						$black_wins += 1;
+					} else if ( $game_result[2] == 2 ) {
+						$white_wins += 1;
+					} else {
+						$draw += 1;
+					}
+					echo Viewer::view_board($display_board);
+					$this->isGameFinished = true;
+				}
+			}
+		}
+		echo "---------Result---------\n";
+		echo "Black Wins ".$black_wins."\n";
+		echo "White Wins ".$white_wins."\n";
+		echo "Draw ".$draw."\n";
+	}
+
 }
 
 $repl = new OthelloRepl();
-$repl->random_game();
+$repl->autoPlay100();
 // $repl->play_with_computer();
