@@ -35,13 +35,23 @@ class OthelloLogic {
 	private $virtual_original_board2;
 	private $virtual_original_board3;
 	private $virtual_original_board4;
+	private $virtual_original_board5;
 	private $virtual_original_display_board;
 	private $virtual_history1;
 	private $virtual_history2;
 	private $virtual_hirtosy3;
 	private $virtual_history4;
 	private $virtual_history5;
-	private $virtual_history6;
+	private $evaluation_board = [
+		[30, -12, 0, -1, -1, 0, -12, 30],
+		[-12, -15, -3, -3, -3, -3, -15, -12],
+		[0, -3, 0, -1, -1, 0, -3, 0],
+		[-1, -3, -1, -1, -1, -1, -3, -1],
+		[-1, -3, -1, -1, -1, -1, -3, -1],
+		[0, -3, 0, -1, -1, 0, -3, 0],
+		[-12, -15, -3, -3, -3, -3, -15, -12],
+		[30, -12, 0, -1, -1, 0, -12, 30],
+	];
 
 	public function __construct() {
 		$this->player = Player::Black->value;
@@ -83,7 +93,7 @@ class OthelloLogic {
 			}
 		}
 		
-		echo "\n\n Blackk = ".$black_count;
+		echo "\n\n Black = ".$black_count;
 		echo "\n White = ".$white_count;
 		echo "\n\n";
 
@@ -402,6 +412,7 @@ class OthelloLogic {
 		return $game_result;
 	}
 
+	// 2手先読み。
 	public function random_move3() {
 		$this->virtual_original_board1 = $this->board;
 		$this->virtual_original_display_board1 = $this->virtual_original_board1;
@@ -449,6 +460,93 @@ class OthelloLogic {
 				$this->moveInVirtualBoard($candidate_move2[0], $candidate_move2[1], $this->virtual_original_board2, $this->virtual_history2);
 				[$display_board3, $candidate_count3, $candidate_moves3, $candidate_defeat_count3] = $this->getCandidateVirtualBoard($this->virtual_original_board2, $this->virtual_history2, $this->virtual_player);
 				$second_move = $candidate_move2[0].$candidate_move2[1];
+				$total_search += 1;
+				//
+				if ($smallest_second_move_count < $candidate_count3) {
+					$smallest_second_move_count = $candidate_count3;
+					array_push($smallest_second_move, $first_move.$second_move);
+				} else if ($smallest_second_move_count == $candidate_count3) {
+					array_push($smallest_second_move, $first_move.$second_move);
+				}
+			}
+			// echo "first move candidate ".$smallest_second_move_count."\n";
+			if ($biggest_first_move_count > $smallest_second_move_count) {
+				$biggest_first_move_count = $smallest_second_move_count;
+				$biggest_first_move = array();
+				$biggest_first_move = $smallest_second_move;
+				// echo "--- marked first move ".$biggest_first_move_count."\n";
+			} else if ( $biggest_first_move_count == $smallest_second_move_count ) {
+				$biggest_first_move = array_merge($biggest_first_move, $smallest_second_move);
+				// echo "--- marked first move ".$biggest_first_move_count."\n";
+			}
+		}
+		if (count($biggest_first_move) == 0) {
+			$this->move($sanitize_near_corner_array[0][0], $sanitize_near_corner_array[0][1]);
+			return [true, true];
+		}
+		echo $total_search."件 探索しました\n";
+		$next_move_candidates = array();
+		foreach ($biggest_first_move as $b_f_move) {
+			array_push($next_move_candidates, [(int)substr($b_f_move, 0, 1), (int)substr($b_f_move, 1, 1)]);
+		}
+		//
+		$next_move_id = rand(0, count($next_move_candidates) - 1);
+		$next_move = $next_move_candidates[$next_move_id];
+		$game_result = $this->move($next_move[0], $next_move[1]);
+		return $game_result;
+	}
+
+	// 3手先読み
+	public function random_move4() {
+		$this->virtual_original_board1 = $this->board;
+		$this->virtual_original_display_board1 = $this->virtual_original_board1;
+		$this->virtual_history1 = $this->moves_histories;
+		$this->virtual_current_player = $this->getPlayer();
+		$this->virtual_player = unserialize(serialize($this->getPlayer()));
+		[$display_board1, $candidate_count1, $candidate_moves1, $candidate_defeat_count1] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1, $this->virtual_player);
+		$pick_corner_array = $this->checkHasCorner($candidate_moves1);
+		if (count($pick_corner_array) == 1) {
+			$game_result = $this->move($pick_corner_array[0][0], $pick_corner_array[0][1]);
+			return $game_result;
+		}
+		$sanitize_near_corner_array = $this->checkHasNearCorner($pick_corner_array);
+		if (count($sanitize_near_corner_array) == 0) {
+			$this->player = Player::Black->value ? Player::White->value : Player::Black->value;
+			$this->virtual_player = Player::Black->value ? Player::White->value : Player::Black->value;
+			return [true, false];
+		}
+		$move_candidate_array = array();
+		$move_candidate_enemy_array = array();
+		$move_candidates_array = array();
+		$total_search = 0;
+		$first_move = "";
+		$second_move = "";
+		$third_move = "";
+		$biggest_first_move = array();
+		$biggest_first_move_count = 100;
+
+
+		foreach ($sanitize_near_corner_array as $candidate_move1) {
+			$this->virtual_player = $this->virtual_current_player;
+			$this->virtual_original_board1 = unserialize(serialize($this->board));
+			$this->virtual_original_display_board1 = $this->virtual_original_board1;
+			$this->virtual_history1 = $this->moves_histories;
+			$this->moveInVirtualBoard($candidate_move1[0], $candidate_move1[1], $this->virtual_original_board1, $this->virtual_history1);
+			[$display_board2, $candidate_count2, $candidate_moves2, $candidate_defeat_count2] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1, $this->virtual_player);
+			$first_move = $candidate_move1[0].$candidate_move1[1];
+
+
+			$smallest_second_move = array();
+			$smallest_second_move_count = 0;
+			foreach ($candidate_moves2 as $candidate_move2) {
+				$this->virtual_player = $this->virtual_current_player == Player::Black->value ? Player::White->value : Player::Black->value;
+				$this->virtual_original_board2 = unserialize(serialize($this->virtual_original_board1));
+				$this->virtual_original_display_board2 = $this->virtual_original_board2;
+				$this->virtual_history2 = $this->virtual_history1;
+				$this->moveInVirtualBoard($candidate_move2[0], $candidate_move2[1], $this->virtual_original_board2, $this->virtual_history2);
+				[$display_board3, $candidate_count3, $candidate_moves3, $candidate_defeat_count3] = $this->getCandidateVirtualBoard($this->virtual_original_board2, $this->virtual_history2, $this->virtual_player);
+				$second_move = $candidate_move2[0].$candidate_move2[1];
+
 
 				$biggest_third_move = array();
 				$biggest_third_move_count = 100;
@@ -461,46 +559,6 @@ class OthelloLogic {
 					[$display_board4, $candidate_count4, $candidate_moves4, $candidate_defeat_count4] = $this->getCandidateVirtualBoard($this->virtual_original_board3, $this->virtual_history3, $this->virtual_player);
 					$third_move = $candidate_move3[0].$candidate_move3[1];
 					$total_search += 1;
-
-					/*
-					// forth ...
-					$smallest_forth_move = array();
-					$smallest_forth_move_count = 100;
-					foreach ($candidate_moves4 as $candidate_move4) {
-						$this->virtual_original_board4 = $this->virtual_original_board3;
-						$this->virtual_history4 = $this->virtual_history3;
-						$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
-						[$display_board5, $candidate_count5, $candidate_moves5, $candidate_defeat_count5] = $this->getCandidateVirtualBoard($this->virtual_original_board4, $this->virtual_history4);
-						$forth_move = $candidate_move4[0].$candidate_move4[1];
-						// fifth ...
-						$biggest_fifth_move = array();
-						$biggest_fifth_move_count = 0;
-						foreach ($candidate_moves5 as $candidate_move5) {
-							$this->virtual_original_board5 = $this->virtual_original_board4;
-							$this->virtual_history5 = $this->virtual_history4;
-							$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
-							[$display_board6, $candidate_count6, $candidate_moves6, $candidate_defeat_count6] = $this->getCandidateVirtualBoard($this->virtual_original_board5, $this->virtual_history5);
-							$fifth_move = $candidate_move5[0].$candidate_move5[1];
-							$total_search += 1;
-							if ($biggest_fifth_move_count < $candidate_count6) {
-								$biggest_fifth_move_count = $candidate_count6;
-								$biggest_fifth_move = array();
-								array_push($biggest_fifth_move, $first_move.$second_move.$third_move.$forth_move.$fifth_move);
-							} else if ($biggest_fifth_move_count == $candidate_count6) {
-								array_push($biggest_fifth_move, $first_move.$second_move.$third_move.$forth_move.$fifth_move);
-							}
-						}
-						if ($smallest_forth_move_count > $biggest_fifth_move_count) {
-							$smallest_forth_move_count = $biggest_fifth_move_count;
-							$smallest_forth_move = array();
-							$smallest_forth_move = $biggest_fifth_move;
-						} else if ($smallest_forth_move_count == $biggest_fifth_move_count) {
-							$smallest_forth_move = array_merge($smallest_forth_move, $biggest_fifth_move);
-						}
-					}
-					*/
-
-					// if you want to down to 4th level, change smallest_forth_move_count to $candidate_count
 					// 
 					if ($biggest_third_move_count > $candidate_count4) {
 						$biggest_third_move_count = $candidate_count4;
@@ -519,6 +577,7 @@ class OthelloLogic {
 					$smallest_second_move = array_merge($smallest_second_move, $biggest_third_move);
 				}
 			}
+
 
 			// echo "smallest second ".$smallest_second_move_count."\n";
 			if ($biggest_first_move_count > $smallest_second_move_count) {
@@ -547,18 +606,171 @@ class OthelloLogic {
 		return $game_result;
 	}
 
-	public function random_move3_practice() {
+	// 4手先読み。
+	public function random_move5() {
 		$this->virtual_original_board1 = $this->board;
 		$this->virtual_original_display_board1 = $this->virtual_original_board1;
 		$this->virtual_history1 = $this->moves_histories;
 		$this->virtual_current_player = $this->getPlayer();
 		$this->virtual_player = unserialize(serialize($this->getPlayer()));
 		[$display_board1, $candidate_count1, $candidate_moves1, $candidate_defeat_count1] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1, $this->virtual_player);
-		$this->moveInVirtualBoard($candidate_moves1[0][0], $candidate_moves1[0][1], $this->virtual_original_board1, $this->virtual_history1);
-		echo Viewer::view_board($this->virtual_original_board1);
+		$pick_corner_array = $this->checkHasCorner($candidate_moves1);
+		if (count($pick_corner_array) == 1) {
+			$game_result = $this->move($pick_corner_array[0][0], $pick_corner_array[0][1]);
+			return $game_result;
+		}
+		$sanitize_near_corner_array = $this->checkHasNearCorner($pick_corner_array);
+		if (count($sanitize_near_corner_array) == 0) {
+			$this->player = Player::Black->value ? Player::White->value : Player::Black->value;
+			$this->virtual_player = Player::Black->value ? Player::White->value : Player::Black->value;
+			return [true, false];
+		}
+		$move_candidate_array = array();
+		$move_candidate_enemy_array = array();
+		$move_candidates_array = array();
+		$total_search = 0;
+		$first_move = "";
+		$second_move = "";
+		$third_move = "";
+		$biggest_first_move = array();
+		$biggest_first_move_count = -100;
 
-		[$display_board2, $candidate_count2, $candidate_moves2, $candidate_defeat_count2] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1, $this->virtual_player);
-		echo Viewer::view_board($display_board2);
+		foreach ($sanitize_near_corner_array as $candidate_move1) {
+			$this->virtual_player = $this->virtual_current_player;
+			$this->virtual_original_board1 = unserialize(serialize($this->board));
+			$this->virtual_original_display_board1 = $this->virtual_original_board1;
+			$this->virtual_history1 = $this->moves_histories;
+			$this->moveInVirtualBoard($candidate_move1[0], $candidate_move1[1], $this->virtual_original_board1, $this->virtual_history1);
+			[$display_board2, $candidate_count2, $candidate_moves2, $candidate_defeat_count2] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1, $this->virtual_player);
+			$first_move = $candidate_move1[0].$candidate_move1[1];
+
+			$smallest_second_move = array();
+			$smallest_second_move_count = 100;
+			foreach ($candidate_moves2 as $candidate_move2) {
+				$this->virtual_player = $this->virtual_current_player == Player::Black->value ? Player::White->value : Player::Black->value;
+				$this->virtual_original_board2 = unserialize(serialize($this->virtual_original_board1));
+				$this->virtual_original_display_board2 = $this->virtual_original_board2;
+				$this->virtual_history2 = $this->virtual_history1;
+				$this->moveInVirtualBoard($candidate_move2[0], $candidate_move2[1], $this->virtual_original_board2, $this->virtual_history2);
+				[$display_board3, $candidate_count3, $candidate_moves3, $candidate_defeat_count3] = $this->getCandidateVirtualBoard($this->virtual_original_board2, $this->virtual_history2, $this->virtual_player);
+				$second_move = $candidate_move2[0].$candidate_move2[1];
+
+				$biggest_third_move = array();
+				$biggest_third_move_count = -100;
+				foreach($candidate_moves3 as $candidate_move3) {
+					$this->virtual_player = $this->virtual_current_player;
+					$this->virtual_original_board3 = unserialize(serialize($this->virtual_original_board2));
+					$this->virtual_original_display_board3 = $this->virtual_original_board3;
+					$this->virtual_history3 = unserialize(serialize($this->virtual_history2));
+					$this->moveInVirtualBoard($candidate_move3[0], $candidate_move3[1], $this->virtual_original_board3, $this->virtual_history3);
+					[$display_board4, $candidate_count4, $candidate_moves4, $candidate_defeat_count4] = $this->getCandidateVirtualBoard($this->virtual_original_board3, $this->virtual_history3, $this->virtual_player);
+					$third_move = $candidate_move3[0].$candidate_move3[1];
+					
+					// forth ...
+					$smallest_forth_move = array();
+					$smallest_forth_move_count = 100;
+					foreach ($candidate_moves4 as $candidate_move4) {
+						$this->virtual_player = $this->virtual_current_player == Player::Black->value ? Player::White->value : Player::Black->value;
+						$this->virtual_original_board4 = unserialize(serialize($this->virtual_original_board3));
+						$this->virtual_history4 = unserialize(serialize($this->virtual_history3));
+						$this->moveInVirtualBoard($candidate_move4[0], $candidate_move4[1], $this->virtual_original_board4, $this->virtual_history4);
+						[$display_board5, $candidate_count5, $candidate_moves5, $candidate_defeat_count5] = $this->getCandidateVirtualBoard($this->virtual_original_board4, $this->virtual_history4, $this->virtual_player);
+						$forth_move = $candidate_move4[0].$candidate_move4[1];
+						$candidate_moves5 = $this->checkHasNearCorner($candidate_moves5);
+						$total_search += 1;
+						/*
+						// fifth ...
+						$biggest_fifth_move = array();
+						$biggest_fifth_move_count = 0;
+						foreach ($candidate_moves5 as $candidate_move5) {
+							$this->virtual_original_board5 = $this->virtual_original_board4;
+							$this->virtual_history5 = $this->virtual_history4;
+							$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
+							[$display_board6, $candidate_count6, $candidate_moves6, $candidate_defeat_count6] = $this->getCandidateVirtualBoard($this->virtual_original_board5, $this->virtual_history5);
+							$fifth_move = $candidate_move5[0].$candidate_move5[1];
+							$total_search += 1;
+							if ($biggest_fifth_move_count < $candidate_count6) {
+								$biggest_fifth_move_count = $candidate_count6;
+								$biggest_fifth_move = array();
+								array_push($biggest_fifth_move, $first_move.$second_move.$third_move.$forth_move.$fifth_move);
+							} else if ($biggest_fifth_move_count == $candidate_count6) {
+								array_push($biggest_fifth_move, $first_move.$second_move.$third_move.$forth_move.$fifth_move);
+							}
+						}
+						*/
+						/*
+						first_move_point = $this->evaluation_board[$candidate_move1[0]][$candidate_move1[1]];
+						$third_move_point = $this->evaluation_board[$candidate_move3[0]][$candidate_move3[1]];
+						*/
+						$candidate_count5 = count($candidate_moves5);
+						$evaluation_count = ($candidate_count5 - $candidate_count4 ** 2);
+						// echo "- fifth move candidate ".$evaluation_count."\n";
+						if ($smallest_forth_move_count > $evaluation_count) {
+							$smallest_forth_move_count = $evaluation_count;
+							$smallest_forth_move = array();
+							$current_move = $first_move.$second_move.$third_move.$forth_move;
+							array_push($smallest_forth_move, $current_move);
+							// echo "--- marked fifth move candidate ".$evaluation_count."\n";
+						} else if ($smallest_forth_move_count == $evaluation_count) {
+							$current_move = $first_move.$second_move.$third_move.$forth_move;
+							array_push($smallest_forth_move, $current_move);
+							// echo "--- marked fifth move candidate ".$evaluation_count."\n";
+						}
+					}
+
+					// if you want to down to 4th level, change smallest_forth_move_count to $candidate_count
+					// 
+					/*
+					$first_move_point = $this->evaluation_board[$candidate_move1[0]][$candidate_move1[1]];
+					$third_move_point = $this->evaluation_board[$candidate_move3[0]][$candidate_move3[1]];
+					$evaluation_count = $candidate_count4 - $first_move_point - $third_move_point;
+					*/
+					// echo "- forth move candidate".$smallest_forth_move_count."\n";
+					if ($biggest_third_move_count < $smallest_forth_move_count) {
+						$biggest_third_move_count = $smallest_forth_move_count;
+						$biggest_third_move = array();
+						$biggest_third_move = $smallest_forth_move;
+						// echo "--- marked forth move candidate".$smallest_forth_move_count."\n";
+					} else if ($biggest_third_move_count == $smallest_forth_move_count) {
+						$biggest_third_move = array_merge($biggest_third_move, $smallest_forth_move);
+						// echo "--- marked forth move candidate".$smallest_forth_move_count."\n";
+					}
+				}
+				if ($smallest_second_move_count > $biggest_third_move_count) {
+					$smallest_second_move_count = $biggest_third_move_count;
+					$smallest_second_move = array();
+					$smallest_second_move = $biggest_third_move;
+				} else if ($smallest_second_move_count == $biggest_third_move_count) {
+					$smallest_second_move = array_merge($smallest_second_move, $biggest_third_move);
+				}
+			}
+			// echo "first move candidate ".$smallest_second_move_count."\n";
+			if ($biggest_first_move_count < $smallest_second_move_count) {
+				$biggest_first_move_count = $smallest_second_move_count;
+				$biggest_first_move = array();
+				$biggest_first_move = $smallest_second_move;
+				// echo "--- marked first move ".$biggest_first_move_count."\n";
+			} else if ( $biggest_first_move_count == $smallest_second_move_count ) {
+				$biggest_first_move = array_merge($biggest_first_move, $smallest_second_move);
+				// echo "--- marked first move ".$biggest_first_move_count."\n";
+			}
+		}
+		// echo var_dump($biggest_first_move);
+		// echo $biggest_first_move_count."\n";
+		if (count($biggest_first_move) == 0) {
+			$this->move($sanitize_near_corner_array[0][0], $sanitize_near_corner_array[0][1]);
+			return [true, true];
+		}
+		echo $total_search."件 探索しました\n";
+		$next_move_candidates = array();
+		foreach ($biggest_first_move as $b_f_move) {
+			array_push($next_move_candidates, [(int)substr($b_f_move, 0, 1), (int)substr($b_f_move, 1, 1)]);
+		}
+		//
+		$next_move_id = rand(0, count($next_move_candidates) - 1);
+		$next_move = $next_move_candidates[$next_move_id];
+		$game_result = $this->move($next_move[0], $next_move[1]);
+		return $game_result;
 	}
 
 	public function checkHasCorner($candidate_moves) {

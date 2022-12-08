@@ -96,7 +96,7 @@ class OthelloRepl {
 					echo "Your move is incorrect...\nmove again\n\n";
 				}
 			} else {
-				[$is_success, $is_game_continue] = $this->othello->random_move3();
+				[$is_success, $is_game_continue] = $this->othello->random_move5();
 				echo "Computer played.\n\n";
 				if ($is_game_continue == false ) {
 					$this->isGameFinished = true;
@@ -112,15 +112,16 @@ class OthelloRepl {
 		$black_wins = 0;
 		$white_wins = 0;
 		$draw = 0;
-		for ($i = 0; $i < 10; $i++) {
+		for ($i = 0; $i < 1; $i++) {
 			$this->othello->initBoard();
 			$this->isGameFinished = false;
-			echo "---------勝負".$i."---------\n";
+			$i_count = $i + 1;
+			echo "---------勝負".$i_count."---------\n";
 			while($this->isGameFinished == false) {
 				$is_success = ""; 
 				$is_game_continue = "";
 				if ($this->othello->getPlayer() == 1) {
-					[$is_success, $is_game_continue] = $this->othello->random_move3();
+					[$is_success, $is_game_continue] = $this->othello->random_move5();
 				} else if ($this->othello->getPlayer() == 2) {
 					[$is_success, $is_game_continue] = $this->othello->random_move2();
 				}
@@ -140,6 +141,7 @@ class OthelloRepl {
 				}
 			}
 		}
+		echo "\n";
 		echo "---------Result---------\n";
 		echo "Black Wins ".$black_wins."\n";
 		echo "White Wins ".$white_wins."\n";
