@@ -547,7 +547,6 @@ class OthelloLogic {
 				[$display_board3, $candidate_count3, $candidate_moves3, $candidate_defeat_count3] = $this->getCandidateVirtualBoard($this->virtual_original_board2, $this->virtual_history2, $this->virtual_player);
 				$second_move = $candidate_move2[0].$candidate_move2[1];
 
-
 				$biggest_third_move = array();
 				$biggest_third_move_count = 100;
 				foreach($candidate_moves3 as $candidate_move3) {
@@ -633,7 +632,7 @@ class OthelloLogic {
 		$second_move = "";
 		$third_move = "";
 		$biggest_first_move = array();
-		$biggest_first_move_count = -100;
+		$biggest_first_move_count = 500;
 
 		foreach ($sanitize_near_corner_array as $candidate_move1) {
 			$this->virtual_player = $this->virtual_current_player;
@@ -645,7 +644,7 @@ class OthelloLogic {
 			$first_move = $candidate_move1[0].$candidate_move1[1];
 
 			$smallest_second_move = array();
-			$smallest_second_move_count = 100;
+			$smallest_second_move_count = -500;
 			foreach ($candidate_moves2 as $candidate_move2) {
 				$this->virtual_player = $this->virtual_current_player == Player::Black->value ? Player::White->value : Player::Black->value;
 				$this->virtual_original_board2 = unserialize(serialize($this->virtual_original_board1));
@@ -656,7 +655,7 @@ class OthelloLogic {
 				$second_move = $candidate_move2[0].$candidate_move2[1];
 
 				$biggest_third_move = array();
-				$biggest_third_move_count = -100;
+				$biggest_third_move_count = 500;
 				foreach($candidate_moves3 as $candidate_move3) {
 					$this->virtual_player = $this->virtual_current_player;
 					$this->virtual_original_board3 = unserialize(serialize($this->virtual_original_board2));
@@ -665,10 +664,13 @@ class OthelloLogic {
 					$this->moveInVirtualBoard($candidate_move3[0], $candidate_move3[1], $this->virtual_original_board3, $this->virtual_history3);
 					[$display_board4, $candidate_count4, $candidate_moves4, $candidate_defeat_count4] = $this->getCandidateVirtualBoard($this->virtual_original_board3, $this->virtual_history3, $this->virtual_player);
 					$third_move = $candidate_move3[0].$candidate_move3[1];
+					if ($candidate_count4 == 0) {
+						continue;
+					}
 					
 					// forth ...
 					$smallest_forth_move = array();
-					$smallest_forth_move_count = 100;
+					$smallest_forth_move_count = -500;
 					foreach ($candidate_moves4 as $candidate_move4) {
 						$this->virtual_player = $this->virtual_current_player == Player::Black->value ? Player::White->value : Player::Black->value;
 						$this->virtual_original_board4 = unserialize(serialize($this->virtual_original_board3));
@@ -703,40 +705,33 @@ class OthelloLogic {
 						$third_move_point = $this->evaluation_board[$candidate_move3[0]][$candidate_move3[1]];
 						*/
 						$candidate_count5 = count($candidate_moves5);
-						$evaluation_count = ($candidate_count5 - $candidate_count4 ** 2);
-						// echo "- fifth move candidate ".$evaluation_count."\n";
-						if ($smallest_forth_move_count > $evaluation_count) {
+						$evaluation_count = ($candidate_count5 - $candidate_count4);
+						// echo "- fifth move candidate ".$evaluation_count." ".$first_move.$second_move.$third_move.$forth_move."\n";
+						if ($smallest_forth_move_count < $evaluation_count) {
 							$smallest_forth_move_count = $evaluation_count;
 							$smallest_forth_move = array();
 							$current_move = $first_move.$second_move.$third_move.$forth_move;
 							array_push($smallest_forth_move, $current_move);
-							// echo "--- marked fifth move candidate ".$evaluation_count."\n";
+							// echo "--- marked fifth move candidate ".$evaluation_count." ".$first_move.$second_move.$third_move.$forth_move."\n";
 						} else if ($smallest_forth_move_count == $evaluation_count) {
 							$current_move = $first_move.$second_move.$third_move.$forth_move;
 							array_push($smallest_forth_move, $current_move);
-							// echo "--- marked fifth move candidate ".$evaluation_count."\n";
+							// echo "--- marked fifth move candidate ".$evaluation_count." ".$first_move.$second_move.$third_move.$forth_move."\n";
 						}
 					}
-
 					// if you want to down to 4th level, change smallest_forth_move_count to $candidate_count
-					// 
-					/*
-					$first_move_point = $this->evaluation_board[$candidate_move1[0]][$candidate_move1[1]];
-					$third_move_point = $this->evaluation_board[$candidate_move3[0]][$candidate_move3[1]];
-					$evaluation_count = $candidate_count4 - $first_move_point - $third_move_point;
-					*/
-					// echo "- forth move candidate".$smallest_forth_move_count."\n";
-					if ($biggest_third_move_count < $smallest_forth_move_count) {
+					// echo "- forth move candidate".$smallest_forth_move_count." ".var_dump($smallest_forth_move)."\n";
+					if ($biggest_third_move_count > $smallest_forth_move_count) {
 						$biggest_third_move_count = $smallest_forth_move_count;
 						$biggest_third_move = array();
 						$biggest_third_move = $smallest_forth_move;
-						// echo "--- marked forth move candidate".$smallest_forth_move_count."\n";
+						// echo "--- marked forth move candidate".$smallest_forth_move_count." ".var_dump($smallest_forth_move)."\n";
 					} else if ($biggest_third_move_count == $smallest_forth_move_count) {
 						$biggest_third_move = array_merge($biggest_third_move, $smallest_forth_move);
-						// echo "--- marked forth move candidate".$smallest_forth_move_count."\n";
+						// echo "--- marked forth move candidate".$smallest_forth_move_count." ".var_dump($smallest_forth_move)."\n";
 					}
 				}
-				if ($smallest_second_move_count > $biggest_third_move_count) {
+				if ($smallest_second_move_count < $biggest_third_move_count) {
 					$smallest_second_move_count = $biggest_third_move_count;
 					$smallest_second_move = array();
 					$smallest_second_move = $biggest_third_move;
@@ -745,7 +740,7 @@ class OthelloLogic {
 				}
 			}
 			// echo "first move candidate ".$smallest_second_move_count."\n";
-			if ($biggest_first_move_count < $smallest_second_move_count) {
+			if ($biggest_first_move_count > $smallest_second_move_count) {
 				$biggest_first_move_count = $smallest_second_move_count;
 				$biggest_first_move = array();
 				$biggest_first_move = $smallest_second_move;
@@ -797,7 +792,7 @@ class OthelloLogic {
 		return $notNearCornerArray;
 	}
 
-	public function checkSmallestOrBiggestDefeatMove($candidate_moves, $defeat_candidate, $smallest) {
+	public function makeDefeatedStoneArrayFromCandidate($candidate_moves, $defeat_candidate) {
 		$fixed_defeat_candidate = array();
 		foreach ($candidate_moves as $candidate_m) {
 			$defeat_candidate_key = (string)((string)$candidate_m[0].(string)$candidate_m[1]);
@@ -805,6 +800,11 @@ class OthelloLogic {
 				$fixed_defeat_candidate = $fixed_defeat_candidate + array($defeat_candidate_key => $defeat_candidate[$defeat_candidate_key]);
 			}
 		}
+		return $fixed_defeat_candidate;
+	}
+
+	public function checkSmallestOrBiggestDefeatMove($candidate_moves, $defeat_candidate, $smallest) {
+		$fixed_defeat_candidate = $this->makeDefeatedStoneArrayFromCandidate($candidate_moves, $defeat_candidate);
 		$defeat_count = 1;
 		if ($smallest == true) {
 			$defeat_count = min($fixed_defeat_candidate);

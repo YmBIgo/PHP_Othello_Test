@@ -88,6 +88,7 @@ class OthelloInputGame {
 	public function viewGameBoard() {
 		[$display_board, $candidate_moves] = $this->othello->getCandidateBoard();
 		echo Viewer::view_board($display_board);
+		echo "\n";
 	}
 }
 
@@ -96,12 +97,17 @@ class OthelloInputGame {
 // http://hp.vector.co.jp/authors/VA015468/platina/kif/kif.html から棋譜は取ってきました。
 // Input Exmaple 3 : F5D6C3D3C4F4F6G5E6D7E3C5F3E7H5E2C6D2C2G3D1H4H3F2G4E1H6B3A3C7B6B5G6G2H1H2F8A5E8B2B8B4A2C1A1B1F1G1A4F7G8G7H8H7A6C8D8B7A8A7
 // https://www.hasera.net/othello/saizenham.html?f5d6c3d3c4f4f6g5e6d7e3c5f3e7h5e2c6d2c2g3d1h4h3f2g4e1h6b3a3c7b6b5g6g2h1h2f8a5e8b2b8b4a2c1a1b1f1g1a4f7g8g7h8h7a6c8d8b7a8a7&start_move=21 から 棋譜を取ってきました。
+// Input Example4 : C4E3F5C6C5G6G5E6C7C3C2B4A3A4D3E2D2D6D7G4F4E1C1F6F2F1F7E8B3G3F3D8E7C8H3H4H5B5
 
 /*
 $game = new OthelloInputGame();
 // $game->inputGameByCommandLine();
-$game->inputGame("C4E3F5C6C5G6G5E6C7C3C2B4A3A4D3E2D2D6D7G4F4E1C1F6F2F1F7E8B3G3F3D8E7C8H3H4H5B5");
+$game->inputGame("F5D6C6F4E6G6D3C4B3C5E3B4");
 $game->startGame();
 $game->viewGameBoard();
+$game->othello->random_move5();
+$game->viewGameBoard();
+$game->othello->random_move4();
 */
+
 

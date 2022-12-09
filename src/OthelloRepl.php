@@ -112,7 +112,7 @@ class OthelloRepl {
 		$black_wins = 0;
 		$white_wins = 0;
 		$draw = 0;
-		for ($i = 0; $i < 1; $i++) {
+		for ($i = 0; $i < 10; $i++) {
 			$this->othello->initBoard();
 			$this->isGameFinished = false;
 			$i_count = $i + 1;
@@ -123,7 +123,7 @@ class OthelloRepl {
 				if ($this->othello->getPlayer() == 1) {
 					[$is_success, $is_game_continue] = $this->othello->random_move5();
 				} else if ($this->othello->getPlayer() == 2) {
-					[$is_success, $is_game_continue] = $this->othello->random_move2();
+					[$is_success, $is_game_continue] = $this->othello->random_move4();
 				}
 				if ($is_game_continue == false) {
 					[$display_board, $candidate_moves] = $this->othello->getCandidateBoard();
