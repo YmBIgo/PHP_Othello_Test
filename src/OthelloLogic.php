@@ -7,15 +7,15 @@ require 'vendor/autoload.php';
 use Exception;
 
 enum Player: int {
-	case Black = 1;
-	case White = 2;
+	case BLACK = 1;
+	case WHITE = 2;
 }
 
 enum Stone: int {
-	case Blank = 0;
-	case Black = 1;
-	case White = 2;
-	case Candidate = 3;
+	case BLANK = 0;
+	case BLACK = 1;
+	case WHITE = 2;
+	case CANDIDATE = 3;
 }
 
 class OthelloLogic {
@@ -27,6 +27,10 @@ class OthelloLogic {
 	private $moves_histories;
 	private $game_history;
 	private const OTHELLO_HORIZONTAL_ALPHABET_ARRAY = array("A", "B", "C", "D", "E", "F", "G", "H");
+	private const BOARD_WIDTH = 8;
+	private const BOARD_WITH_INDEX = 7;
+	private const BOARD_MAX_CORNER = 7;
+	private const BOARD_MIN_CORNER = 0;
 
 	private $virtual_board;
 	private $virtual_player;
@@ -54,23 +58,23 @@ class OthelloLogic {
 	];
 
 	public function __construct() {
-		$this->player = Player::Black->value;
-		$this->virtual_player = Player::Black->value;
+		$this->player = Player::BLACK->value;
+		$this->virtual_player = Player::BLACK->value;
 	}
 
 	public function initBoard() {
 		$this->board = [
-			[0, 0, 0, 0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0, 0, 0, 0],
-			[0, 0, 0, 2, 1, 0, 0, 0],
-			[0, 0, 0, 1, 2, 0, 0, 0],
-			[0, 0, 0, 0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0, 0, 0, 0],
+			[Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value],
+			[Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value],
+			[Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value],
+			[Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::WHITE->value, Stone::BLACK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value],
+			[Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLACK->value, Stone::WHITE->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value],
+			[Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value],
+			[Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value],
+			[Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value, Stone::BLANK->value],
 		];
-		$this->player = Player::Black->value;
-		$this->virtual_player = Player::Black->value;
+		$this->player = Player::BLACK->value;
+		$this->virtual_player = Player::BLACK->value;
 		$this->moves_histories = [[3, 3], [3, 4], [4, 3], [4, 4]];
 		$this->virtual_history1 = [[3, 3], [3, 4], [4, 3], [4, 4]];
 		$this->game_history = [];
@@ -85,9 +89,9 @@ class OthelloLogic {
 		$white_count = 0;
 		foreach ($this->board as $board_row) {
 			foreach ($board_row as $move) {
-				if ($move == Stone::Black->value) {
+				if ($move == Stone::BLACK->value) {
 					$black_count += 1;
-				} else if ($move == Stone::White->value) {
+				} else if ($move == Stone::WHITE->value) {
 					$white_count += 1;
 				}
 			}
@@ -112,9 +116,9 @@ class OthelloLogic {
 		$white_count = 0;
 		foreach ($this->board as $board_row) {
 			foreach ($board_row as $move) {
-				if ($move == Stone::Black->value) {
+				if ($move == Stone::BLACK->value) {
 					$black_count += 1;
-				} else if ($move == Stone::White->value) {
+				} else if ($move == Stone::WHITE->value) {
 					$white_count += 1;
 				}
 			}
@@ -125,10 +129,10 @@ class OthelloLogic {
 			$game_result = 0;
 			$game_diff = 0;
 		} else if ($black_count > $white_count) {
-			$game_result = Player::Black->value;;
+			$game_result = Player::BLACK->value;;
 			$game_diff = $black_count - $white_count;
 		} else if ($white_count > $black_count) {
-			$game_result = Player::White->value;;
+			$game_result = Player::WHITE->value;;
 			$game_diff = $white_count - $black_count;
 		}
 		return [$black_count, $white_count, $game_result, $game_diff];
@@ -145,12 +149,12 @@ class OthelloLogic {
  	}
 
 	private function getCandidateBoardImpl(&$board, &$history, $player) {
-		$enemy_player = $player == Player::Black->value ? Player::White->value : Player::Black->value;
+		$enemy_player = $player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 		[$enemy_player_array, $ally_player_array] = $this->getEnemyAndAllyPlayerArray($enemy_player, $board);
 		$surroundCandidates =  $this->getSurroundCandidates($enemy_player_array, $history);
 		[$surroundCandidates, $defeatedCandidates] = $this->traceSurroundCanMove($surroundCandidates, $board, $history, $player);
 		foreach ($surroundCandidates as $candidate ) {
-			$board[$candidate[0]][$candidate[1]] = Stone::Candidate->value;
+			$board[$candidate[0]][$candidate[1]] = Stone::CANDIDATE->value;
 		}
 		return [$board, count($surroundCandidates), $surroundCandidates, $defeatedCandidates];
 	}
@@ -158,8 +162,8 @@ class OthelloLogic {
 	public function getEnemyAndAllyPlayerArray ($enemy_player, $board) {
 		$enemy_player_array = array();
 		$ally_player_array = array();
-		for ($i = 0; $i < 8; $i++) {
-			for ($j = 0; $j < 8; $j++) {
+		for ($i = 0; $i < self::BOARD_WIDTH; $i++) {
+			for ($j = 0; $j < self::BOARD_WIDTH; $j++) {
 				if ($board[$i][$j] == $enemy_player) {
 					array_push($enemy_player_array, [$i, $j]);
 				} else if ( $board[$i][$j] == $this->getPlayer() ) {
@@ -236,7 +240,7 @@ class OthelloLogic {
 		$surroundMovesArray = [$aboveMove, $belowMove, $rightMove, $leftMove, $aboveleftMove, $aboverightMove, $belowleftMove, $belowrightMove];
 		$surroundMovesResult = array();
 		foreach ($surroundMovesArray as $surroundMove) {
-			if ($surroundMove[0] < 0 || $surroundMove[0] > 7 || $surroundMove[1] < 0 || $surroundMove[1] > 7) {
+			if ($surroundMove[0] < 0 || $surroundMove[0] > self::BOARD_WITH_INDEX || $surroundMove[1] < 0 || $surroundMove[1] > self::BOARD_WITH_INDEX) {
 				continue;
 			}
 			$hMoveCounter = 0;
@@ -274,8 +278,8 @@ class OthelloLogic {
 	public function move($vertical_pos, $horizontal_pos) {
 		[$display_board_1, $candidate_count_1] = $this->getCandidateBoard();
 		if ($candidate_count_1 == 0) {
-			$this->player = $this->player == Player::Black->value ? Player::White->value : Player::Black->value;
-			$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
+			$this->player = $this->player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
+			$this->virtual_player = $this->virtual_player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 			[$display_board_2, $candidate_count_2] = $this->getCandidateBoard();
 			if ($candidate_count_2 == 0) {
 				return [false, false];
@@ -285,10 +289,10 @@ class OthelloLogic {
 		if (gettype($vertical_pos) != "integer" || gettype($vertical_pos) != "integer") {
 			return [false, true];
 		}
-		if ((int)$vertical_pos < 0 || (int)$vertical_pos > 8 || (int)$horizontal_pos < 0 || (int)$horizontal_pos > 8) {
+		if ((int)$vertical_pos < 0 || (int)$vertical_pos > self::BOARD_WIDTH || (int)$horizontal_pos < 0 || (int)$horizontal_pos > self::BOARD_WIDTH) {
 			return [false, true];
 		}
-		if ($this->player != Player::Black->value && $this->player != Player::White->value) {
+		if ($this->player != Player::BLACK->value && $this->player != Player::WHITE->value) {
 			throw new Exception("Unknown player;");
 		}
 		$checkMoveHistories = $this->checkMoveHistories($vertical_pos, $horizontal_pos, $this->moves_histories);
@@ -312,14 +316,14 @@ class OthelloLogic {
 		array_push($this->moves_histories, [$vertical_pos, $horizontal_pos]);
 		array_push($this->game_history, [$vertical_pos, $horizontal_pos]);
 
-		$this->player = $this->player == Player::Black->value ? Player::White->value : Player::Black->value;
-		$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
+		$this->player = $this->player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
+		$this->virtual_player = $this->virtual_player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 		[$display_board, $candidate_count] = $this->getCandidateBoard();
 		if ($candidate_count != 0) {
 			return [true, true];
 		} else {
-			$this->player = $this->player == Player::Black->value ? Player::White->value : Player::Black->value;
-			$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
+			$this->player = $this->player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
+			$this->virtual_player = $this->virtual_player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 			[$display_board2, $candidate_count2] = $this->getCandidateBoard();
 			if ($candidate_count2 == 0) {
 				return [true, false];
@@ -331,7 +335,7 @@ class OthelloLogic {
 	public function moveInVirtualBoard($vertical_pos, $horizontal_pos, &$board, &$history) {
 		[$display_board_1, $candidate_count_1] = $this->getCandidateVirtualBoard($board, $history, $this->virtual_player);
 		if ($candidate_count_1 == 0) {
-			$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
+			$this->virtual_player = $this->virtual_player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 			[$display_board_2, $candidate_count_2] = $this->getCandidateVirtualBoard($board, $history, $this->virtual_player);
 			if ($candidate_count_2 == 0) {
 				return [false, false];
@@ -341,10 +345,10 @@ class OthelloLogic {
 		if (gettype($vertical_pos) != "integer" || gettype($vertical_pos) != "integer") {
 			return [false, true];
 		}
-		if ((int)$vertical_pos < 0 || (int)$vertical_pos > 8 || (int)$horizontal_pos < 0 || (int)$horizontal_pos > 8) {
+		if ((int)$vertical_pos < 0 || (int)$vertical_pos > self::BOARD_WIDTH || (int)$horizontal_pos < 0 || (int)$horizontal_pos > self::BOARD_WIDTH) {
 			return [false, true];
 		}
-		if ($this->virtual_player != Player::Black->value && $this->virtual_player != Player::White->value) {
+		if ($this->virtual_player != Player::BLACK->value && $this->virtual_player != Player::WHITE->value) {
 			throw new Exception("Unknown player;");
 		}
 		$checkMoveHistories = $this->checkMoveHistories($vertical_pos, $horizontal_pos, $history);
@@ -367,12 +371,12 @@ class OthelloLogic {
 		$this->commitDefeatedMove([$vertical_pos, $horizontal_pos], $this->virtual_player, $board);
 		array_push($history, [$vertical_pos, $horizontal_pos]);
 
-		$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
+		$this->virtual_player = $this->virtual_player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 		[$display_board1, $candidate_count1] = $this->getCandidateVirtualBoard($board, $history, $this->virtual_player);
 		if ($candidate_count1 != 0) {
 			return [true, true];
 		} else {
-			$this->virtual_player = $this->virtual_player == Player::Black->value ? Player::White->value : Player::Black->value;
+			$this->virtual_player = $this->virtual_player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 			[$display_board2, $candidate_count2] = $this->getCandidateVirtualBoard($board, $history, $this->virtual_player);
 			if ($candidate_count2 == 0) {
 				return [true, false];
@@ -395,8 +399,8 @@ class OthelloLogic {
 		$pick_corner_array = $this->checkHasCorner($candidate_moves);
 		$sanitize_near_corner_array = $this->checkHasNearCorner($pick_corner_array);
 		if (count($sanitize_near_corner_array) == 0) {
-			$this->player = Player::Black->value ? Player::White->value : Player::Black->value;
-			$this->virtual_player = Player::Black->value ? Player::White->value : Player::Black->value;
+			$this->player = Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
+			$this->virtual_player = Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 			return [true, false];
 		}
 		$game_history_len = count($this->game_history);
@@ -427,8 +431,8 @@ class OthelloLogic {
 		}
 		$sanitize_near_corner_array = $this->checkHasNearCorner($pick_corner_array);
 		if (count($sanitize_near_corner_array) == 0) {
-			$this->player = Player::Black->value ? Player::White->value : Player::Black->value;
-			$this->virtual_player = Player::Black->value ? Player::White->value : Player::Black->value;
+			$this->player = Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
+			$this->virtual_player = Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 			return [true, false];
 		}
 		$move_candidate_array = array();
@@ -453,7 +457,7 @@ class OthelloLogic {
 			$smallest_second_move = array();
 			$smallest_second_move_count = 0;
 			foreach ($candidate_moves2 as $candidate_move2) {
-				$this->virtual_player = $this->virtual_current_player == Player::Black->value ? Player::White->value : Player::Black->value;
+				$this->virtual_player = $this->virtual_current_player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 				$this->virtual_original_board2 = unserialize(serialize($this->virtual_original_board1));
 				$this->virtual_original_display_board2 = $this->virtual_original_board2;
 				$this->virtual_history2 = $this->virtual_history1;
@@ -511,8 +515,8 @@ class OthelloLogic {
 		}
 		$sanitize_near_corner_array = $this->checkHasNearCorner($pick_corner_array);
 		if (count($sanitize_near_corner_array) == 0) {
-			$this->player = Player::Black->value ? Player::White->value : Player::Black->value;
-			$this->virtual_player = Player::Black->value ? Player::White->value : Player::Black->value;
+			$this->player = Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
+			$this->virtual_player = Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 			return [true, false];
 		}
 		$move_candidate_array = array();
@@ -524,7 +528,6 @@ class OthelloLogic {
 		$third_move = "";
 		$biggest_first_move = array();
 		$biggest_first_move_count = 100;
-
 
 		foreach ($sanitize_near_corner_array as $candidate_move1) {
 			$this->virtual_player = $this->virtual_current_player;
@@ -539,7 +542,7 @@ class OthelloLogic {
 			$smallest_second_move = array();
 			$smallest_second_move_count = 0;
 			foreach ($candidate_moves2 as $candidate_move2) {
-				$this->virtual_player = $this->virtual_current_player == Player::Black->value ? Player::White->value : Player::Black->value;
+				$this->virtual_player = $this->virtual_current_player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 				$this->virtual_original_board2 = unserialize(serialize($this->virtual_original_board1));
 				$this->virtual_original_display_board2 = $this->virtual_original_board2;
 				$this->virtual_history2 = $this->virtual_history1;
@@ -620,8 +623,8 @@ class OthelloLogic {
 		}
 		$sanitize_near_corner_array = $this->checkHasNearCorner($pick_corner_array);
 		if (count($sanitize_near_corner_array) == 0) {
-			$this->player = Player::Black->value ? Player::White->value : Player::Black->value;
-			$this->virtual_player = Player::Black->value ? Player::White->value : Player::Black->value;
+			$this->player = Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
+			$this->virtual_player = Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 			return [true, false];
 		}
 		$move_candidate_array = array();
@@ -646,7 +649,7 @@ class OthelloLogic {
 			$smallest_second_move = array();
 			$smallest_second_move_count = -500;
 			foreach ($candidate_moves2 as $candidate_move2) {
-				$this->virtual_player = $this->virtual_current_player == Player::Black->value ? Player::White->value : Player::Black->value;
+				$this->virtual_player = $this->virtual_current_player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 				$this->virtual_original_board2 = unserialize(serialize($this->virtual_original_board1));
 				$this->virtual_original_display_board2 = $this->virtual_original_board2;
 				$this->virtual_history2 = $this->virtual_history1;
@@ -672,7 +675,7 @@ class OthelloLogic {
 					$smallest_forth_move = array();
 					$smallest_forth_move_count = -500;
 					foreach ($candidate_moves4 as $candidate_move4) {
-						$this->virtual_player = $this->virtual_current_player == Player::Black->value ? Player::White->value : Player::Black->value;
+						$this->virtual_player = $this->virtual_current_player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 						$this->virtual_original_board4 = unserialize(serialize($this->virtual_original_board3));
 						$this->virtual_history4 = unserialize(serialize($this->virtual_history3));
 						$this->moveInVirtualBoard($candidate_move4[0], $candidate_move4[1], $this->virtual_original_board4, $this->virtual_history4);
@@ -705,7 +708,8 @@ class OthelloLogic {
 						$third_move_point = $this->evaluation_board[$candidate_move3[0]][$candidate_move3[1]];
 						*/
 						$candidate_count5 = count($candidate_moves5);
-						$evaluation_count = ($candidate_count5 - $candidate_count4);
+						// $evaluation_count = ($candidate_count5 - $candidate_count4 ** 2);
+						$evaluation_count = $candidate_count4 ** 2;
 						// echo "- fifth move candidate ".$evaluation_count." ".$first_move.$second_move.$third_move.$forth_move."\n";
 						if ($smallest_forth_move_count < $evaluation_count) {
 							$smallest_forth_move_count = $evaluation_count;
@@ -770,7 +774,7 @@ class OthelloLogic {
 
 	public function checkHasCorner($candidate_moves) {
 		foreach ($candidate_moves as $candidate_m) {
-			if ($this->MoveIsEqual($candidate_m, [0, 0]) || $this->MoveIsEqual($candidate_m, [0, 7]) || $this->MoveIsEqual($candidate_m, [7, 0]) || $this->MoveIsEqual($candidate_m, [7, 7])) {
+			if ($this->MoveIsEqual($candidate_m, [self::BOARD_MIN_CORNER, self::BOARD_MIN_CORNER]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MIN_CORNER, self::BOARD_MAX_CORNER]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MAX_CORNER, self::BOARD_MIN_CORNER]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MAX_CORNER, self::BOARD_MAX_CORNER])) {
 				return [$candidate_m];
 			}
 		}
@@ -780,7 +784,7 @@ class OthelloLogic {
 	public function checkHasNearCorner($candidate_moves) {
 		$notNearCornerArray = array();
 		foreach ($candidate_moves as $candidate_m) {
-			if ($this->MoveIsEqual($candidate_m, [1, 0]) || $this->MoveIsEqual($candidate_m, [1, 1]) || $this->MoveIsEqual($candidate_m, [0, 1]) || $this->MoveIsEqual($candidate_m, [0, 6]) || $this->MoveIsEqual($candidate_m, [1, 6]) || $this->MoveIsEqual($candidate_m, [1, 7]) || $this->MoveIsEqual($candidate_m, [6, 0]) || $this->MoveIsEqual($candidate_m, [6, 1]) || $this->MoveIsEqual($candidate_m, [7, 1]) || $this->MoveIsEqual($candidate_m, [6, 7]) || $this->MoveIsEqual($candidate_m, [6, 6]) || $this->MoveIsEqual($candidate_m, [7, 6])) {
+			if ($this->MoveIsEqual($candidate_m, [1, self::BOARD_MIN_CORNER]) || $this->MoveIsEqual($candidate_m, [1, 1]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MIN_CORNER, 1]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MIN_CORNER, 6]) || $this->MoveIsEqual($candidate_m, [1, 6]) || $this->MoveIsEqual($candidate_m, [1, self::BOARD_MAX_CORNER]) || $this->MoveIsEqual($candidate_m, [6, self::BOARD_MIN_CORNER]) || $this->MoveIsEqual($candidate_m, [6, 1]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MAX_CORNER, 1]) || $this->MoveIsEqual($candidate_m, [6, self::BOARD_MAX_CORNER]) || $this->MoveIsEqual($candidate_m, [6, 6]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MAX_CORNER, 6])) {
 				// pass
 			} else {
 				array_push($notNearCornerArray, $candidate_m);
@@ -837,9 +841,9 @@ class OthelloLogic {
 		if ($vertical_pos >= 6) { return [false, 0]; }
 		$check_vertical_pos = $vertical_pos;
 		$defeated_enemy = array();
-		$enemy_player = $player == Player::Black->value ? Player::White->value : Player::Black->value;
+		$enemy_player = $player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 		while (true) {
-			if ($check_vertical_pos == 7) { break; }
+			if ($check_vertical_pos == self::BOARD_MAX_CORNER) { break; }
 			if ( $board[$check_vertical_pos + 1][$horizontal_pos] == $enemy_player ) {
 				$check_vertical_pos = $check_vertical_pos + 1;
 				array_push($defeated_enemy, [$check_vertical_pos, $horizontal_pos]);
@@ -848,7 +852,7 @@ class OthelloLogic {
 			break;
 		}
 		if ($check_vertical_pos == $vertical_pos) { ; return [false, 0]; }
-		if ($check_vertical_pos == 7) { return [false, 0]; }
+		if ($check_vertical_pos == self::BOARD_MAX_CORNER) { return [false, 0]; }
 		if ($board[$check_vertical_pos + 1][$horizontal_pos] != $player) {
 			return [false, 0];
 		}
@@ -870,9 +874,9 @@ class OthelloLogic {
 		if ($vertical_pos <= 1) { return [false, 0]; }
 		$check_vertical_pos = $vertical_pos;
 		$defeated_enemy = array();
-		$enemy_player = $player == Player::Black->value ? Player::White->value : Player::Black->value;
+		$enemy_player = $player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 		while (true) {
-			if ($check_vertical_pos == 0) { break; }
+			if ($check_vertical_pos == self::BOARD_MIN_CORNER) { break; }
 			if ( $board[$check_vertical_pos - 1][$horizontal_pos] == $enemy_player ) {
 				$check_vertical_pos = $check_vertical_pos - 1;
 				array_push($defeated_enemy, [$check_vertical_pos, $horizontal_pos]);
@@ -881,7 +885,7 @@ class OthelloLogic {
 			break;
 		}
 		if ($check_vertical_pos == $vertical_pos) { return [false, 0]; }
-		if ($check_vertical_pos == 0) { return [false, 0]; }
+		if ($check_vertical_pos == self::BOARD_MIN_CORNER) { return [false, 0]; }
 		if ($board[$check_vertical_pos - 1][$horizontal_pos] != $player) { return [false, 0]; }
 		if ($is_commit == true) {
 			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
@@ -901,9 +905,9 @@ class OthelloLogic {
 		if ($horizontal_pos <= 1) { return [false, 0]; }
 		$check_horizontal_pos = $horizontal_pos;
 		$defeated_enemy = array();
-		$enemy_player = $player == Player::Black->value ? Player::White->value : Player::Black->value;
+		$enemy_player = $player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 		while (true) {
-			if ($check_horizontal_pos == 0) { break; }
+			if ($check_horizontal_pos == self::BOARD_MIN_CORNER) { break; }
 			if ($board[$vertical_pos][$check_horizontal_pos - 1] == $enemy_player) {
 				$check_horizontal_pos = $check_horizontal_pos - 1;
 				array_push($defeated_enemy, [$vertical_pos, $check_horizontal_pos]);
@@ -912,7 +916,7 @@ class OthelloLogic {
 			break;
 		}
 		if ($check_horizontal_pos == $horizontal_pos) {return [false, 0]; }
-		if ($check_horizontal_pos == 0) { return [false, 0]; }
+		if ($check_horizontal_pos == self::BOARD_MIN_CORNER) { return [false, 0]; }
 		if ($board[$vertical_pos][$check_horizontal_pos - 1] != $player) { return [false, 0]; }
 		if ($is_commit == true) {
 			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
@@ -932,9 +936,9 @@ class OthelloLogic {
 		if ($horizontal_pos >= 6) { return [false, 0]; }
 		$check_horizontal_pos = $horizontal_pos;
 		$defeated_enemy = array();
-		$enemy_player = $player == Player::Black->value ? Player::White->value : Player::Black->value;
+		$enemy_player = $player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 		while (true) {
-			if ($check_horizontal_pos == 7) { break; }
+			if ($check_horizontal_pos == self::BOARD_MAX_CORNER) { break; }
 			if ($board[$vertical_pos][$check_horizontal_pos + 1] == $enemy_player) {
 				$check_horizontal_pos = $check_horizontal_pos + 1;
 				array_push($defeated_enemy, [$vertical_pos, $check_horizontal_pos]);
@@ -943,7 +947,7 @@ class OthelloLogic {
 			break;
 		}
 		if ($check_horizontal_pos == $horizontal_pos) { return [false, 0]; }
-		if ($check_horizontal_pos == 7) { return [false, 0]; }
+		if ($check_horizontal_pos == self::BOARD_MAX_CORNER) { return [false, 0]; }
 		if ($board[$vertical_pos][$check_horizontal_pos + 1] != $player) { return [false, 0]; }
 		if ($is_commit == true) {
 			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
@@ -964,9 +968,9 @@ class OthelloLogic {
 		$check_vertical_pos = $vertical_pos;
 		$check_horizontal_pos = $horizontal_pos;
 		$defeated_enemy = array();
-		$enemy_player = $player == Player::Black->value ? Player::White->value : Player::Black->value;
+		$enemy_player = $player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 		while (true) {
-			if ($check_horizontal_pos == 0 || $check_vertical_pos == 7) { break; }
+			if ($check_horizontal_pos == self::BOARD_MIN_CORNER || $check_vertical_pos == self::BOARD_MAX_CORNER) { break; }
 			if ($board[$check_vertical_pos+1][$check_horizontal_pos-1] == $enemy_player) {
 				$check_vertical_pos = $check_vertical_pos + 1 ;
 				$check_horizontal_pos = $check_horizontal_pos - 1 ;
@@ -976,7 +980,7 @@ class OthelloLogic {
 			break;
 		}
 		if ( $check_vertical_pos == $vertical_pos ) { return [false, 0]; }
-		if ($check_vertical_pos == 7 || $check_horizontal_pos == 0 ) { return [false, 0]; }
+		if ($check_vertical_pos == self::BOARD_MAX_CORNER || $check_horizontal_pos == self::BOARD_MIN_CORNER ) { return [false, 0]; }
 		if ($board[$check_vertical_pos+1][$check_horizontal_pos-1] != $player) { return [false, 0]; }
 		if ($is_commit == true) {
 			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
@@ -997,9 +1001,9 @@ class OthelloLogic {
 		$check_vertical_pos = $vertical_pos;
 		$check_horizontal_pos = $horizontal_pos;
 		$defeated_enemy = array();
-		$enemy_player = $player == Player::Black->value ? Player::White->value : Player::Black->value;
+		$enemy_player = $player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 		while (true) {
-			if ($check_horizontal_pos == 7 || $check_vertical_pos == 7) { break; }
+			if ($check_horizontal_pos == self::BOARD_MAX_CORNER || $check_vertical_pos == self::BOARD_MAX_CORNER) { break; }
 			if ($board[$check_vertical_pos+1][$check_horizontal_pos+1] == $enemy_player) {
 				$check_vertical_pos = $check_vertical_pos + 1;
 				$check_horizontal_pos = $check_horizontal_pos + 1;
@@ -1009,7 +1013,7 @@ class OthelloLogic {
 			break;
 		}
 		if ( $check_vertical_pos == $vertical_pos ) { return [false, 0]; }
-		if ($check_vertical_pos == 7 || $check_horizontal_pos == 7 ) { return [false, 0]; }
+		if ($check_vertical_pos == self::BOARD_MAX_CORNER || $check_horizontal_pos == self::BOARD_MAX_CORNER ) { return [false, 0]; }
 		if ($board[$check_vertical_pos+1][$check_horizontal_pos+1] != $player) { return [false, 0]; }
 		if ($is_commit == true) {
 			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
@@ -1030,9 +1034,9 @@ class OthelloLogic {
 		$check_vertical_pos = $vertical_pos;
 		$check_horizontal_pos = $horizontal_pos;
 		$defeated_enemy = array();
-		$enemy_player = $player == Player::Black->value ? Player::White->value : Player::Black->value;
+		$enemy_player = $player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 		while (true) {
-			if ($check_horizontal_pos == 0 || $check_vertical_pos == 0) { break; }
+			if ($check_horizontal_pos == self::BOARD_MIN_CORNER || $check_vertical_pos == self::BOARD_MIN_CORNER) { break; }
 			if ($board[$check_vertical_pos-1][$check_horizontal_pos-1] == $enemy_player) {
 				$check_vertical_pos = $check_vertical_pos - 1;
 				$check_horizontal_pos = $check_horizontal_pos - 1;
@@ -1042,7 +1046,7 @@ class OthelloLogic {
 			break;
 		}
 		if ( $check_vertical_pos == $vertical_pos ) { return [false, 0]; }
-		if ($check_vertical_pos == 0 || $check_horizontal_pos == 0) { return [false, 0]; }
+		if ($check_vertical_pos == self::BOARD_MIN_CORNER || $check_horizontal_pos == self::BOARD_MIN_CORNER) { return [false, 0]; }
 		if ($board[$check_vertical_pos-1][$check_horizontal_pos-1] != $player) { return [false, 0]; }
 		if ($is_commit == true) {
 			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
@@ -1063,9 +1067,9 @@ class OthelloLogic {
 		$check_vertical_pos = $vertical_pos;
 		$check_horizontal_pos = $horizontal_pos;
 		$defeated_enemy = array();
-		$enemy_player = $player == Player::Black->value ? Player::White->value : Player::Black->value;
+		$enemy_player = $player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
 		while (true) {
-			if ($check_horizontal_pos == 7 || $check_vertical_pos == 0) { break; }
+			if ($check_horizontal_pos == self::BOARD_MAX_CORNER || $check_vertical_pos == self::BOARD_MIN_CORNER) { break; }
 			if ($board[$check_vertical_pos-1][$check_horizontal_pos+1] == $enemy_player) {
 				$check_vertical_pos = $check_vertical_pos - 1;
 				$check_horizontal_pos = $check_horizontal_pos + 1;
@@ -1075,7 +1079,7 @@ class OthelloLogic {
 			break;
 		}
 		if ( $check_vertical_pos == $vertical_pos ) { return [false, 0]; }
-		if ($check_vertical_pos == 0 || $check_horizontal_pos == 7) { return [false, 0]; }
+		if ($check_vertical_pos == self::BOARD_MIN_CORNER || $check_horizontal_pos == self::BOARD_MAX_CORNER) { return [false, 0]; }
 		if ($board[$check_vertical_pos-1][$check_horizontal_pos+1] != $player) { return [false, 0]; }
 		if ($is_commit == true) {
 			$this->commitDefeatedMoves($defeated_enemy, $player, $board, $history);
@@ -1107,7 +1111,7 @@ class OthelloLogic {
 		$is_blank_exist_flag = false;
 		foreach ($this->board as $move_row) {
 			foreach ($move_row as $move) {
-				if ($move == 0) {
+				if ($move == Stone::BLACK->value) {
 					return false;
 				}
 			}
