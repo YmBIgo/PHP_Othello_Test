@@ -31,6 +31,8 @@ class OthelloLogic {
 	private const BOARD_WITH_INDEX = 7;
 	private const BOARD_MAX_CORNER = 7;
 	private const BOARD_MIN_CORNER = 0;
+	private const BOARD_MAX_NEAR_CORNER = 6;
+	private const BOARD_MIN_NEAR_CORNER = 1;
 
 	private $virtual_board;
 	private $virtual_player;
@@ -784,7 +786,7 @@ class OthelloLogic {
 	public function checkHasNearCorner($candidate_moves) {
 		$notNearCornerArray = array();
 		foreach ($candidate_moves as $candidate_m) {
-			if ($this->MoveIsEqual($candidate_m, [1, self::BOARD_MIN_CORNER]) || $this->MoveIsEqual($candidate_m, [1, 1]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MIN_CORNER, 1]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MIN_CORNER, 6]) || $this->MoveIsEqual($candidate_m, [1, 6]) || $this->MoveIsEqual($candidate_m, [1, self::BOARD_MAX_CORNER]) || $this->MoveIsEqual($candidate_m, [6, self::BOARD_MIN_CORNER]) || $this->MoveIsEqual($candidate_m, [6, 1]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MAX_CORNER, 1]) || $this->MoveIsEqual($candidate_m, [6, self::BOARD_MAX_CORNER]) || $this->MoveIsEqual($candidate_m, [6, 6]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MAX_CORNER, 6])) {
+			if ($this->MoveIsEqual($candidate_m, [self::BOARD_MIN_NEAR_CORNER, self::BOARD_MIN_CORNER]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MIN_NEAR_CORNER, self::BOARD_MIN_NEAR_CORNER]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MIN_CORNER, self::BOARD_MIN_NEAR_CORNER]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MIN_CORNER, self::BOARD_MAX_NEAR_CORNER]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MIN_NEAR_CORNER, self::BOARD_MAX_NEAR_CORNER]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MIN_NEAR_CORNER, self::BOARD_MAX_CORNER]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MAX_NEAR_CORNER, self::BOARD_MIN_CORNER]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MAX_NEAR_CORNER, self::BOARD_MIN_NEAR_CORNER]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MAX_CORNER, self::BOARD_MIN_NEAR_CORNER]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MAX_NEAR_CORNER, self::BOARD_MAX_CORNER]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MAX_NEAR_CORNER, self::BOARD_MAX_NEAR_CORNER]) || $this->MoveIsEqual($candidate_m, [self::BOARD_MAX_CORNER, self::BOARD_MAX_NEAR_CORNER])) {
 				// pass
 			} else {
 				array_push($notNearCornerArray, $candidate_m);
@@ -838,7 +840,7 @@ class OthelloLogic {
 		return $result;
 	}
 	private function checkBelowImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
-		if ($vertical_pos >= 6) { return [false, 0]; }
+		if ($vertical_pos >= self::BOARD_MAX_NEAR_CORNER) { return [false, 0]; }
 		$check_vertical_pos = $vertical_pos;
 		$defeated_enemy = array();
 		$enemy_player = $player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
@@ -871,7 +873,7 @@ class OthelloLogic {
 	}
 	private function checkAboveImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
 		//
-		if ($vertical_pos <= 1) { return [false, 0]; }
+		if ($vertical_pos <= self::BOARD_MIN_NEAR_CORNER) { return [false, 0]; }
 		$check_vertical_pos = $vertical_pos;
 		$defeated_enemy = array();
 		$enemy_player = $player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
@@ -902,7 +904,7 @@ class OthelloLogic {
 	}
 	private function checkLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
 		//
-		if ($horizontal_pos <= 1) { return [false, 0]; }
+		if ($horizontal_pos <= self::BOARD_MIN_NEAR_CORNER) { return [false, 0]; }
 		$check_horizontal_pos = $horizontal_pos;
 		$defeated_enemy = array();
 		$enemy_player = $player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
@@ -933,7 +935,7 @@ class OthelloLogic {
 	}
 	private function checkRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
 		//
-		if ($horizontal_pos >= 6) { return [false, 0]; }
+		if ($horizontal_pos >= self::BOARD_MAX_NEAR_CORNER) { return [false, 0]; }
 		$check_horizontal_pos = $horizontal_pos;
 		$defeated_enemy = array();
 		$enemy_player = $player == Player::BLACK->value ? Player::WHITE->value : Player::BLACK->value;
@@ -964,7 +966,7 @@ class OthelloLogic {
 	}
 	private function checkBelowLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
 		//
-		if ($vertical_pos >= 6 || $horizontal_pos <= 1) { return [false, 0]; }
+		if ($vertical_pos >= self::BOARD_MAX_NEAR_CORNER || $horizontal_pos <= self::BOARD_MIN_NEAR_CORNER) { return [false, 0]; }
 		$check_vertical_pos = $vertical_pos;
 		$check_horizontal_pos = $horizontal_pos;
 		$defeated_enemy = array();
@@ -997,7 +999,7 @@ class OthelloLogic {
 	}
 	private function checkBelowRightImpl($vertical_pos, $horizontal_pos, $player, &$is_commit, &$board, &$history) {
 		//
-		if ($vertical_pos >= 6 || $horizontal_pos >= 6) { return [false, 0]; }
+		if ($vertical_pos >= self::BOARD_MAX_NEAR_CORNER || $horizontal_pos >= self::BOARD_MAX_NEAR_CORNER) { return [false, 0]; }
 		$check_vertical_pos = $vertical_pos;
 		$check_horizontal_pos = $horizontal_pos;
 		$defeated_enemy = array();
@@ -1030,7 +1032,7 @@ class OthelloLogic {
 	}
 	private function checkAboveLeftImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
 		//
-		if ($vertical_pos <= 1 || $horizontal_pos <= 1) { return [false, 0]; }
+		if ($vertical_pos <= self::BOARD_MIN_NEAR_CORNER || $horizontal_pos <= self::BOARD_MIN_NEAR_CORNER) { return [false, 0]; }
 		$check_vertical_pos = $vertical_pos;
 		$check_horizontal_pos = $horizontal_pos;
 		$defeated_enemy = array();
@@ -1063,7 +1065,7 @@ class OthelloLogic {
 	}
 	private function checkAboveRightImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
 		//
-		if ($vertical_pos <= 1 || $horizontal_pos >= 6) { return [false, 0]; }
+		if ($vertical_pos <= self::BOARD_MIN_NEAR_CORNER || $horizontal_pos >= self::BOARD_MAX_NEAR_CORNER) { return [false, 0]; }
 		$check_vertical_pos = $vertical_pos;
 		$check_horizontal_pos = $horizontal_pos;
 		$defeated_enemy = array();
