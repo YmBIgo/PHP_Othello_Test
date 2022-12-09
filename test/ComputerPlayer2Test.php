@@ -33,7 +33,7 @@ class ComputerPlayer2Test extends TestCase{
 		$this->assertSame(count($pick_corner_array), 1);
 		$this->assertSame($this->othello_game->othello->MoveIsEqual($pick_corner_array[0], [7, 0]), true);
 		[$is_success, $is_game_continue] = $this->othello_game->othello->random_move2();
-		$this->assertSame($this->othello_game->othello->getPlayer(), 1);
+		$this->assertSame($this->othello_game->othello->getPlayer()->value, 1);
 		[$display_board, $candidate_count, $candidate_moves, $candidate_defeat_count] = $this->othello_game->othello->getCandidateBoard();
 		$pick_corner_array = $this->othello_game->othello->checkHasCorner($candidate_moves);
 		$this->assertSame(count($pick_corner_array), 3);
@@ -80,7 +80,7 @@ class ComputerPlayer2Test extends TestCase{
 		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
 		//
 		[$is_success, $is_game_continue] = $this->othello_game->othello->random_move2();
-		$this->assertSame($this->othello_game->othello->getPlayer(), 2);
+		$this->assertSame($this->othello_game->othello->getPlayer()->value, 2);
 		[$display_board, $candidate_count, $candidate_moves, $candidate_defeat_count] = $this->othello_game->othello->getCandidateBoard();
 		$pick_corner_array = $this->othello_game->othello->checkHasCorner($candidate_moves);
 		$this->assertSame(count($pick_corner_array), 6);
@@ -168,7 +168,7 @@ class ComputerPlayer2Test extends TestCase{
 			"◯●◯◯◯◯×□\n";
 		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
 		[$is_success, $is_game_continue] = $this->othello_game->othello->random_move2();
-		$this->assertSame($this->othello_game->othello->getPlayer(), 2);
+		$this->assertSame($this->othello_game->othello->getPlayer()->value, 2);
 		$this->assertSame($is_success, true);
 		[$display_board, $candidate_count, $candidate_moves, $candidate_defeat_count] = $this->othello_game->othello->getCandidateBoard();
 		$this->assertSame($candidate_count, 4);

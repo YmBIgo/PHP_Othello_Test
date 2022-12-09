@@ -9,8 +9,10 @@ use Coffeecup\Othello\Viewer;
 
 $othello_board = new OthelloLogic();
 $othello_board->initBoard();
-$othello_board->random_move3_practice();
-// $othello_board->move(2, 3);
+// $othello_board->random_move3_practice();
+$othello_board->move(2, 3);
+[$display_board, $candidate_count] = $othello_board->getCandidateBoard();
+echo Viewer::view_board($display_board);
 // $othello_board->move(2, 4);
 // $othello_board->random_move3();
 // $othello_board->move(3, 5);
