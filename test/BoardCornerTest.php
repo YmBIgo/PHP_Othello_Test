@@ -27,7 +27,6 @@ class BoardCornerTest extends TestCase {
 		$this->othello_board->move(5, 5);
 		$this->othello_board->move(2, 5);
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
-		$this->assertSame($candidate_count, 12);
 		$expected_board_info =
 			"□□□□□□□□\n".
 			"□□□□×□××\n".
@@ -38,6 +37,7 @@ class BoardCornerTest extends TestCase {
 			"□□□□×●●●\n".
 			"□□□□×□××\n";
 		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+		$this->assertSame($candidate_count, 12);
 		$this->othello_board->move(7, 7);
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
 		$this->assertSame($candidate_count, 9);
@@ -67,7 +67,6 @@ class BoardCornerTest extends TestCase {
 		$result = $this->othello_board->move(7, 7)[0];
 		$this->assertSame($result, false);
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
-		$this->assertSame($candidate_count, 5);
 		$expected_board_info =
 			"□□□□□□□□\n".
 			"□□□□□□□□\n".
@@ -78,6 +77,7 @@ class BoardCornerTest extends TestCase {
 			"□□□□□●●●\n".
 			"□□□□□□□□\n";
 		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+		$this->assertSame($candidate_count, 5);
 	}
 	public function testBoardCase56() {
 		$this->othello_board->initBoard();
@@ -95,7 +95,6 @@ class BoardCornerTest extends TestCase {
 		$this->othello_board->move(5, 7);
 		$this->othello_board->move(2, 7);
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
-		$this->assertSame($candidate_count, 11);
 		$expected_board_info =
 			"□□□□□□□□\n".
 			"□□□□□□××\n".
@@ -106,6 +105,7 @@ class BoardCornerTest extends TestCase {
 			"□□□□□●●●\n".
 			"□□□□××××\n";
 		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+		$this->assertSame($candidate_count, 11);
 		$this->othello_board->move(7, 7);
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
 		$this->assertSame($candidate_count, 6);
@@ -137,7 +137,6 @@ class BoardCornerTest extends TestCase {
 		$this->othello_board->move(7, 4);
 		$this->othello_board->move(7, 6);
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
-		$this->assertSame($candidate_count, 6);
 		$expected_board_info =
 			"□□□□□□□□\n".
 			"□□□□□□□□\n".
@@ -148,6 +147,7 @@ class BoardCornerTest extends TestCase {
 			"□□□□□●◯●\n".
 			"□□□□●◯◯×\n";
 		$this->assertSame(Viewer::view_board($display_board), $expected_board_info);
+		$this->assertSame($candidate_count, 6);
 		$this->othello_board->move(7, 7);
 		[$display_board, $candidate_count] = $this->othello_board->getCandidateBoard();
 		$this->assertSame($candidate_count, 7);

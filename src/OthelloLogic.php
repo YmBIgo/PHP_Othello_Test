@@ -315,6 +315,7 @@ class OthelloLogic {
 			return [false, true];
 		}
 
+		/*
 		$checkBelow = $this->checkBelow($vertical_pos, $horizontal_pos, $this->player, true);
 		$checkAbove = $this->checkAbove($vertical_pos, $horizontal_pos, $this->player, true);
 		$checkLeft  = $this->checkLeft($vertical_pos, $horizontal_pos, $this->player, true);
@@ -326,6 +327,13 @@ class OthelloLogic {
 		if ($checkBelow == false && $checkAbove == false && $checkLeft == false && $checkRight == false && $checkBelowLeft == false &&  $checkBelowRight == false && $checkAboveLeft == false && $checkAboveRight == false ) {
 			return [false, true];
 		}
+		*/
+		// refactoring check direction code...
+		$is_stone_value = $this->checkDirection($vertical_pos, $horizontal_pos, $this->getPlayer(), true, $this->board, $this->moves_histories);
+		if ($is_stone_value == false) {
+			return [false, true];
+		}
+		//
 		$this->commitDefeatedMove([$vertical_pos, $horizontal_pos], $this->player, $this->board);
 		array_push($this->moves_histories, [$vertical_pos, $horizontal_pos]);
 		array_push($this->game_history, [$vertical_pos, $horizontal_pos]);
@@ -382,6 +390,14 @@ class OthelloLogic {
 		if ($checkBelow == false && $checkAbove == false && $checkLeft == false && $checkRight == false && $checkBelowLeft == false &&  $checkBelowRight == false && $checkAboveLeft == false && $checkAboveRight == false ) {
 			return [false, true];
 		}
+		// refactoring check direction code...
+		/*
+		$is_stone_value = $this->checkDirection($vertical_pos, $horizontal_pos, $this->virtual_player, true, $board, $history);
+		if ($is_stone_value == false) {
+			return [false, true];
+		}
+		*/
+		// 
 		$this->commitDefeatedMove([$vertical_pos, $horizontal_pos], $this->virtual_player, $board);
 		array_push($history, [$vertical_pos, $horizontal_pos]);
 
@@ -410,7 +426,7 @@ class OthelloLogic {
 
 	public function random_move2() {
 		[$display_board, $candidate_count, $candidate_moves, $candidate_defeat_count] = $this->getCandidateBoard();
-		echo "random move 2 candidate-moves : ".$candidate_count."\n";
+		// echo "random move 2 candidate-moves : ".$candidate_count."\n";
 		$pick_corner_array = $this->checkHasCorner($candidate_moves);
 		$sanitize_near_corner_array = $this->checkHasNearCorner($pick_corner_array);
 		if (count($sanitize_near_corner_array) == 0) {
@@ -873,37 +889,44 @@ class OthelloLogic {
 		$enemy_player = $player == Player::BLACK ? Player::WHITE : Player::BLACK;
 		$is_turn_flag = false;
 		$turn_stone_count = 0;
-		for($i = 0; $i < count(BOARD_SURROUND_ARRAY); $i++) {
-			$current_direction = BOARD_SURROUND_ARRAY[$i];
-			$move_pos = $original_pos;
+		for($i = 0; $i < count(self::BOARD_SURROUND_ARRAY); $i++) {
+			$current_direction = self::BOARD_SURROUND_ARRAY[$i];
+			$move_pos = [$original_pos[0], $original_pos[1]];
 			$turn_stone_array = array();
 			while(true) {
+				$new_move_pos_vertical = $move_pos[0];
+				$new_move_pos_horizontal = $move_pos[1];
+				if ($i == 0 && ($new_move_pos_vertical <= 0 || $new_move_pos_horizontal <= 0) ) { break; }
+				if ($i == 1 && ($new_move_pos_vertical <= 0) ) { break; }
+				if ($i == 2 && ($new_move_pos_vertical <= 0 || $new_move_pos_horizontal >= 7) ) { break; }
+				if ($i == 3 && ($new_move_pos_horizontal <= 0)) { break; }
+				if ($i == 4 && ($new_move_pos_horizontal >= 7)) { break; }
+				if ($i == 5 && ($new_move_pos_vertical >= 7 || $new_move_pos_horizontal <= 0)) { break; }
+				if ($i == 6 && ($new_move_pos_vertical >= 7)) { break; }
+				if ($i == 7 && ($new_move_pos_vertical >= 7 || $new_move_pos_horizontal >= 7)) { break; }
 				$new_move_pos_vertical = $move_pos[0]+$current_direction[0];
 				$new_move_pos_horizontal = $move_pos[1]+$current_direction[1];
 				$move_pos = [$new_move_pos_vertical, $new_move_pos_horizontal];
-				if ($i == 0 || $new_move_pos_vertical == 1 || $new_move_pos_horizontal == 1 ) { break; }
-				if ($i == 1 || $new_move_pos_vertical == 1 ) { break; }
-				if ($i == 2 || $new_move_pos_vertical == 1 || $new_move_pos_horizontal == 6) { break; }
-				if ($i == 3 || $new_move_pos_horizontal == 1) { break; }
-				if ($i == 4 || $new_move_pos_horizontal == 6) { break; }
-				if ($i == 5 || $new_move_pos_vertical == 6 || $new_move_pos_horizontal == 1) { break; }
-				if ($i == 6 || $new_move_pos_vertical == 6) { break; }
-				if ($i == 7 || $new_move_pos_vertical == 6 || $new_move_pos_horizontal == 6) { break; }
 				if ($board[$move_pos[0]][$move_pos[1]] == $enemy_player->value) {
 					array_push($turn_stone_array, $move_pos);
 					continue;
 				}
 				break;
 			}
+			/*
 			$new_move_pos_vertical = $move_pos[0]+$current_direction[0];
 			$new_move_pos_horizontal = $move_pos[1]+$current_direction[1];
-			if ($board[$new_move_pos_vertical][$new_move_pos_horizontal] == $player) {
+			*/
+			if (count($turn_stone_array) > 0 && $board[$new_move_pos_vertical][$new_move_pos_horizontal] == $player->value) {
 				$is_turn_flag = true;
 				$turn_stone_count += count($turn_stone_array);
 				if ($is_commit == true) {
+					/*
 					for ($j = 0; $j < count($turn_stone_array); $j++) {
-						$board[$turn_stone_array[$j][0]][$turn_stone_array[$j][1]] = $player;
+						$board[$turn_stone_array[$j][0]][$turn_stone_array[$j][1]] = $player->value;
 					}
+					*/
+					$this->commitDefeatedMoves($turn_stone_array, $player, $board, $history);
 				}
 			}
 		}
@@ -914,7 +937,7 @@ class OthelloLogic {
 		}
 	}
 	public function checkDirection($vertical_pos, $horizontal_pos, $player, $is_commit) {
-		$result = $this->checkDirectionsImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $this->board, $this->history);
+		$result = $this->checkDirectionsImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $this->board, $this->moves_histories);
 		return $result[0];
 	}
 
