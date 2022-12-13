@@ -45,9 +45,9 @@ class OthelloRepl {
 		while($this->isGameFinished == false) {
 			$is_success = ""; 
 			$is_game_continue = "";
-			if ($this->othello->getPlayer() == 1) {
-				[$is_success, $is_game_continue] = $this->othello->random_move3();
-			} else if ($this->othello->getPlayer() == 2) {
+			if ($this->othello->getPlayer()->value == 1) {
+				[$is_success, $is_game_continue] = $this->othello->random_move4();
+			} else if ($this->othello->getPlayer()->value == 2) {
 				[$is_success, $is_game_continue] = $this->othello->random_move2();
 			}
 			$i ++;
@@ -80,8 +80,8 @@ class OthelloRepl {
 		while ($this->isGameFinished == false) {
 			[$display_board, $candidate_moves] = $this->othello->getCandidateBoard();
 			echo Viewer::view_board($display_board)."\n";
-			if ($this->othello->getPlayer() == $chosen_player) {
-				echo "It's your turn ".$this->othello->getPlayer()." \n";
+			if ($this->othello->getPlayer()->value == $chosen_player) {
+				echo "It's your turn ".$this->othello->getPlayer()->value." \n";
 				echo "Please Input vertical position;\n";
 				$stdin_vertical = (int)trim(fgets(STDIN));
 				echo "Please Input horizontal position;\n";
@@ -96,7 +96,7 @@ class OthelloRepl {
 					echo "Your move is incorrect...\nmove again\n\n";
 				}
 			} else {
-				[$is_success, $is_game_continue] = $this->othello->random_move5();
+				[$is_success, $is_game_continue] = $this->othello->random_move4();
 				echo "Computer played.\n\n";
 				if ($is_game_continue == false ) {
 					$this->isGameFinished = true;
@@ -120,10 +120,10 @@ class OthelloRepl {
 			while($this->isGameFinished == false) {
 				$is_success = ""; 
 				$is_game_continue = "";
-				if ($this->othello->getPlayer() == 1) {
-					[$is_success, $is_game_continue] = $this->othello->random_move5();
-				} else if ($this->othello->getPlayer() == 2) {
+				if ($this->othello->getPlayer()->value == 1) {
 					[$is_success, $is_game_continue] = $this->othello->random_move4();
+				} else if ($this->othello->getPlayer()->value == 2) {
+					[$is_success, $is_game_continue] = $this->othello->random_move3();
 				}
 				if ($is_game_continue == false) {
 					[$display_board, $candidate_moves] = $this->othello->getCandidateBoard();

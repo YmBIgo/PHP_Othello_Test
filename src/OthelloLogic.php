@@ -6,6 +6,7 @@ require 'vendor/autoload.php';
 
 use Exception;
 
+// Be careful !!! enum is not implemented in PHP8.0 or below.
 enum Player: int {
 	case BLACK = 1;
 	case WHITE = 2;
@@ -33,6 +34,8 @@ class OthelloLogic {
 	private const BOARD_MIN_CORNER = 0;
 	private const BOARD_MAX_NEAR_CORNER = 6;
 	private const BOARD_MIN_NEAR_CORNER = 1;
+
+	private const BOARD_SURROUND_ARRAY = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
 
 	private $virtual_board;
 	private $virtual_player;
@@ -114,9 +117,16 @@ class OthelloLogic {
 	}
 
 	public function getGameResult() {
+		return $this->getGameResultImpl($this->board);
+ 	}
+ 	public function getVirtualGameResult($virtual_board) {
+ 		return $this->getGameResultImpl($virtual_board);
+ 	}
+
+ 	public function getGameResultImpl($board) {
 		$black_count = 0;
 		$white_count = 0;
-		foreach ($this->board as $board_row) {
+		foreach ($board as $board_row) {
 			foreach ($board_row as $move) {
 				if ($move == Stone::BLACK->value) {
 					$black_count += 1;
@@ -400,6 +410,7 @@ class OthelloLogic {
 
 	public function random_move2() {
 		[$display_board, $candidate_count, $candidate_moves, $candidate_defeat_count] = $this->getCandidateBoard();
+		echo "random move 2 candidate-moves : ".$candidate_count."\n";
 		$pick_corner_array = $this->checkHasCorner($candidate_moves);
 		$sanitize_near_corner_array = $this->checkHasNearCorner($pick_corner_array);
 		if (count($sanitize_near_corner_array) == 0) {
@@ -428,6 +439,7 @@ class OthelloLogic {
 		$this->virtual_current_player = $this->getPlayer();
 		$this->virtual_player = unserialize(serialize($this->getPlayer()));
 		[$display_board1, $candidate_count1, $candidate_moves1, $candidate_defeat_count1] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1, $this->virtual_player);
+		echo "random move3 candidate-moves : ".$candidate_count1."\n";
 		$pick_corner_array = $this->checkHasCorner($candidate_moves1);
 		if (count($pick_corner_array) == 1) {
 			$game_result = $this->move($pick_corner_array[0][0], $pick_corner_array[0][1]);
@@ -512,6 +524,7 @@ class OthelloLogic {
 		$this->virtual_current_player = $this->getPlayer();
 		$this->virtual_player = unserialize(serialize($this->getPlayer()));
 		[$display_board1, $candidate_count1, $candidate_moves1, $candidate_defeat_count1] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1, $this->virtual_player);
+		echo "random move4 candidate-moves : ".$candidate_count1."\n";
 		$pick_corner_array = $this->checkHasCorner($candidate_moves1);
 		if (count($pick_corner_array) == 1) {
 			$game_result = $this->move($pick_corner_array[0][0], $pick_corner_array[0][1]);
@@ -540,6 +553,12 @@ class OthelloLogic {
 			$this->virtual_history1 = $this->moves_histories;
 			$this->moveInVirtualBoard($candidate_move1[0], $candidate_move1[1], $this->virtual_original_board1, $this->virtual_history1);
 			[$display_board2, $candidate_count2, $candidate_moves2, $candidate_defeat_count2] = $this->getCandidateVirtualBoard($this->virtual_original_board1, $this->virtual_history1, $this->virtual_player);
+			/*
+			$candidate_moves2 = $this->checkHasCorner($candidate_moves2);
+			if (count($candidate_moves2) != 1) {
+				$candidate_moves2 = $this->checkHasNearCorner($candidate_moves2);
+			}
+			*/
 			$first_move = $candidate_move1[0].$candidate_move1[1];
 
 
@@ -553,6 +572,12 @@ class OthelloLogic {
 				$this->moveInVirtualBoard($candidate_move2[0], $candidate_move2[1], $this->virtual_original_board2, $this->virtual_history2);
 				[$display_board3, $candidate_count3, $candidate_moves3, $candidate_defeat_count3] = $this->getCandidateVirtualBoard($this->virtual_original_board2, $this->virtual_history2, $this->virtual_player);
 				$second_move = $candidate_move2[0].$candidate_move2[1];
+				/*
+				$candidate_moves3 = $this->checkHasCorner($candidate_moves3);
+				if (count($candidate_moves3) != 1) {
+					$candidate_moves3 = $this->checkHasNearCorner($candidate_moves3);
+				}
+				*/
 
 				$biggest_third_move = array();
 				$biggest_third_move_count = 100;
@@ -566,11 +591,20 @@ class OthelloLogic {
 					$third_move = $candidate_move3[0].$candidate_move3[1];
 					$total_search += 1;
 					// 
-					if ($biggest_third_move_count > $candidate_count4) {
-						$biggest_third_move_count = $candidate_count4;
+
+					$evaluation = $candidate_count4;
+
+					if ( count($this->virtual_history3) < 40 ) {
+						[$black_count, $white_count] = $this->getVirtualGameResult($display_board4);
+						$current_count = $this->virtual_player == Player::BLACK ? $black_count - $white_count : $white_count - $black_count;
+						$evaluation = $evaluation - $current_count/2;
+					}
+
+					if ($biggest_third_move_count > $evaluation) {
+						$biggest_third_move_count = $evaluation;
 						$biggest_third_move = array();
 						array_push($biggest_third_move, $first_move.$second_move.$third_move);
-					} else if ($biggest_third_move_count == $candidate_count4) {
+					} else if ($biggest_third_move_count == $evaluation) {
 						array_push($biggest_third_move, $first_move.$second_move.$third_move);
 					}
 				}
@@ -672,6 +706,7 @@ class OthelloLogic {
 					[$display_board4, $candidate_count4, $candidate_moves4, $candidate_defeat_count4] = $this->getCandidateVirtualBoard($this->virtual_original_board3, $this->virtual_history3, $this->virtual_player);
 					$third_move = $candidate_move3[0].$candidate_move3[1];
 					if ($candidate_count4 == 0) {
+						echo "skip for impossible case.\n";
 						continue;
 					}
 					
@@ -830,6 +865,62 @@ class OthelloLogic {
 
 	public function MoveIsEqual($move1, $move2) {
 		return $move1[0] == $move2[0] && $move1[1] == $move2[1];
+	}
+
+	// TODO : refactering 
+	public function checkDirectionsImpl($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
+		$original_pos = [$vertical_pos, $horizontal_pos];
+		$enemy_player = $player == Player::BLACK ? Player::WHITE : Player::BLACK;
+		$is_turn_flag = false;
+		$turn_stone_count = 0;
+		for($i = 0; $i < count(BOARD_SURROUND_ARRAY); $i++) {
+			$current_direction = BOARD_SURROUND_ARRAY[$i];
+			$move_pos = $original_pos;
+			$turn_stone_array = array();
+			while(true) {
+				$new_move_pos_vertical = $move_pos[0]+$current_direction[0];
+				$new_move_pos_horizontal = $move_pos[1]+$current_direction[1];
+				$move_pos = [$new_move_pos_vertical, $new_move_pos_horizontal];
+				if ($i == 0 || $new_move_pos_vertical == 1 || $new_move_pos_horizontal == 1 ) { break; }
+				if ($i == 1 || $new_move_pos_vertical == 1 ) { break; }
+				if ($i == 2 || $new_move_pos_vertical == 1 || $new_move_pos_horizontal == 6) { break; }
+				if ($i == 3 || $new_move_pos_horizontal == 1) { break; }
+				if ($i == 4 || $new_move_pos_horizontal == 6) { break; }
+				if ($i == 5 || $new_move_pos_vertical == 6 || $new_move_pos_horizontal == 1) { break; }
+				if ($i == 6 || $new_move_pos_vertical == 6) { break; }
+				if ($i == 7 || $new_move_pos_vertical == 6 || $new_move_pos_horizontal == 6) { break; }
+				if ($board[$move_pos[0]][$move_pos[1]] == $enemy_player->value) {
+					array_push($turn_stone_array, $move_pos);
+					continue;
+				}
+				break;
+			}
+			$new_move_pos_vertical = $move_pos[0]+$current_direction[0];
+			$new_move_pos_horizontal = $move_pos[1]+$current_direction[1];
+			if ($board[$new_move_pos_vertical][$new_move_pos_horizontal] == $player) {
+				$is_turn_flag = true;
+				$turn_stone_count += count($turn_stone_array);
+				if ($is_commit == true) {
+					for ($j = 0; $j < count($turn_stone_array); $j++) {
+						$board[$turn_stone_array[$j][0]][$turn_stone_array[$j][1]] = $player;
+					}
+				}
+			}
+		}
+		if ($is_turn_flag == false) {
+			return [false, 0];
+		} else {
+			return [true, $turn_stone_count];
+		}
+	}
+	public function checkDirection($vertical_pos, $horizontal_pos, $player, $is_commit) {
+		$result = $this->checkDirectionsImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $this->board, $this->history);
+		return $result[0];
+	}
+
+	public function checkDirectionWithCount($vertical_pos, $horizontal_pos, $player, $is_commit, &$board, &$history) {
+		$result = $this->checkDirectionsImpl($vertical_pos, $horizontal_pos, $player, $is_commit, $this->board, $this->history);
+		return $result;
 	}
 
 	public function checkBelow($vertical_pos, $horizontal_pos, $player, $is_commit) {
